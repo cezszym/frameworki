@@ -1,10 +1,7 @@
 package org.example.entity;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -12,6 +9,22 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private UUID id;
+
+    @ManyToOne
+    @JoinColumn(name = "flat_id")
+    private Flat flat;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    private String checkInDate;
+
+    private String checkOutDate;
+
+    private String creationDate;
+
+    private String status;
 
 }
