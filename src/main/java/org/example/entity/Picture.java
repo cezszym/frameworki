@@ -1,10 +1,7 @@
 package org.example.entity;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -12,6 +9,28 @@ public class Picture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private UUID id;
 
+    @ManyToOne
+    @JoinColumn(name = "flat_id")
+    private Flat flat;
+
+    private String path;
+    private String description;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Flat getFlat() {
+        return flat;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }
