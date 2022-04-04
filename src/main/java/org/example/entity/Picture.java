@@ -1,13 +1,24 @@
 package org.example.entity;
 
 
+import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Picture {
 
     @Id
+    @NotNull
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
@@ -15,22 +26,9 @@ public class Picture {
     @JoinColumn(name = "flat_id")
     private Flat flat;
 
+    @NotNull
     private String path;
+
+    @NotNull
     private String description;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Flat getFlat() {
-        return flat;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }
