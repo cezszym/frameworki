@@ -1,12 +1,11 @@
 package org.example.entity;
 
-
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
-public class Opinion {
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
