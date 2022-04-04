@@ -10,7 +10,7 @@ public class Flat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private UUID id;
 
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -29,11 +29,11 @@ public class Flat {
     private int numOfRooms;
 
 
-    public long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
