@@ -1,15 +1,43 @@
 package org.example.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import javax.persistence.*;
+import java.util.UUID;
+
+@Table(name = "flat_details")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class FlatDetails {
-
+    @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private UUID id;
+
+    @NotNull
+    @OneToOne
+    @JoinColumn(name = "flat_id")
+    private Flat flat;
+
+    @NotNull
+    private Boolean kitchen;
+
+    @NotNull
+    private Boolean bathroom;
+
+    @NotNull
+    private Boolean towels;
+
+    @NotNull
+    private Boolean wifi;
+
+
 
 }
