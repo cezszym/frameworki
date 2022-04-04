@@ -1,95 +1,54 @@
 package org.example.entity;
 
 
+import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.UUID;
 
-
+@Table(name = "flat")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Flat {
-
+    @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @OneToOne
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @NotNull
+    @OneToOne
+    @JoinColumn(name = "flat_details_id")
+    private FlatDetails flatDetails;
+
+    @NotNull
     private String adress;
 
+    @NotNull
     private String postCode;
 
+    @NotNull
     private String city;
 
+    @NotNull
     private String country;
 
+    @NotNull
     private float metrage;
 
+    @NotNull
     private int numOfRooms;
 
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getAdress() {
-        return adress;
-    }
-
-    public void setAdress(String adress) {
-        this.adress = adress;
-    }
-
-    public String getPostCode() {
-        return postCode;
-    }
-
-    public void setPostCode(String postCode) {
-        this.postCode = postCode;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public float getMetrage() {
-        return metrage;
-    }
-
-    public void setMetrage(float metrage) {
-        this.metrage = metrage;
-    }
-
-    public int getNumOfRooms() {
-        return numOfRooms;
-    }
-
-    public void setNumOfRooms(int numOfRooms) {
-        this.numOfRooms = numOfRooms;
-    }
 }
