@@ -1,16 +1,57 @@
 package org.example.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
+    @NotNull
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private UUID id;
 
+    @NotNull
+    private String email;
+
+    @NotNull
+    private String nick;
+
+    @NotNull
+    private String firstname;
+
+    @NotNull
+    private String lastname;
+
+    @NotNull
+    private String phoneNumber;
+
+    @NotNull
+    private String password;
+
+    @NotNull
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Flat> flats;
+
+    @NotNull
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Post> posts;
+
+    @NotNull
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Reservation> reservations;
+
+    @NotNull
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Review> reviews;
 }
