@@ -5,6 +5,7 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
+@Table(name = "post")
 public class Post {
 
     @Id
