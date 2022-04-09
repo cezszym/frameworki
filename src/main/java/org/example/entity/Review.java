@@ -24,12 +24,12 @@ public class Review {
     @ManyToOne
     @NotNull
     @JoinColumn(name = "post_id")
-    private Post post;
+    private UUID post;
 
     @ManyToOne
     @NotNull
     @JoinColumn(name = "user_id")
-    private User user;
+    private UUID user;
 
     @NotNull
     private String contents;
