@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -27,7 +28,6 @@ public class Flat {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NotNull
     @OneToOne
     @JoinColumn(name = "flat_details_id")
     private FlatDetails flatDetails;
