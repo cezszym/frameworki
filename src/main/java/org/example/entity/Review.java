@@ -1,20 +1,18 @@
 package org.example.entity;
 
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
+@Entity
 @Getter
 @Setter
+@Table(name = "review")
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 public class Review {
     @Id
     @NotNull
