@@ -1,11 +1,19 @@
 package org.example.entity;
 
 
+import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
 @Table(name = "post")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Post {
 
     @Id
@@ -20,12 +28,18 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String checkInDate;
+    @NotNull
+    private String title;
 
-    private String checkOutDate;
+    @NotNull
+    private String description;
 
-    private String creationDate;
+    private int price;
 
-    private String status;
+    private boolean promoted;
+
+    private long created;
+
+    private long expired;
 
 }
