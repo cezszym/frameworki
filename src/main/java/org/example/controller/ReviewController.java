@@ -26,22 +26,22 @@ public class ReviewController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<Review> getAllReviewsByUser(@PathVariable UUID userId) {
+    public List<Review> getAllReviewsByUser(@PathVariable("userId") UUID userId) {
         return reviewService.findAllReviewsByUserId(userId);
     }
 
     @GetMapping("/titles/{title}")
-    public List<Review> getAllReviewsByTitle(@PathVariable String title) {
+    public List<Review> getAllReviewsByTitle(@PathVariable("title") String title) {
         return reviewService.findAllReviewsByTitle(title);
     }
 
-    @GetMapping("/most-like")
-    public List<Review> getAllReviewsMostLikes(UUID postId) {
+    @GetMapping("/post/{postId}/most-like")
+    public List<Review> getAllReviewsMostLikes(@PathVariable("postId") UUID postId) {
         return reviewService.findAllReviewsByOrderByLikesDesc(postId);
     }
 
-    @GetMapping("/most-dislike")
-    public List<Review> getAllReviewsMostDislikes(UUID postId) {
+    @GetMapping("/post/{postId}/most-dislike")
+    public List<Review> getAllReviewsMostDislikes(@PathVariable("postId") UUID postId) {
         return reviewService.findAllReviewsByOrderByDislikesDesc(postId);
     }
 }
