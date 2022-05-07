@@ -1,26 +1,24 @@
 package org.example.repository;
 
 import org.example.entity.Review;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.rest.core.annotation.RestResource;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
-@RepositoryRestResource(collectionResourceRel = "reviews", path = "reviews")
+@Repository
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
-    @RestResource(path = "review", rel = "review")
-    Review findReviewById(@Param("id") UUID id);
+    Review findReviewById(UUID id);
 
-    @RestResource(path = "myreviews", rel = "myreviews")
-    List<Review> findAllByUserId(@Param("id") UUID id);
+    List<Review> getAllReviewsByPost(UUID postId);
 
-    Page<Review> findAllByTitleContainingIgnoreCase(Pageable pageable, String title);
+    List<Review> getAllReviewsByUser(UUID userId);
 
-    Page<Review> findAllByUserId(Pageable pageable, UUID userId);
+    List<Review> getAllReviewsByTitle(String title);
+
+    List<Review> findAllReviewsByPostOrderByLikesDesc(UUID postId);
+
+    List<Review> findAllReviewsByPostOrderByDislikesDesc(UUID postId);
 }

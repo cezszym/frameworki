@@ -1,50 +1,47 @@
 package org.example.controller;
 
-import org.example.dto.PageDTO;
-import org.example.dto.ReviewDTO;
+import org.example.entity.Review;
 import org.example.service.ReviewService;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 
-@Controller
-@RequestMapping("/api/review")
+@RestController
+@RequestMapping("/api/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
-    public ReviewController(ReviewService reviewService) {
+    public ReviewController(final ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 
-    @GetMapping
-    public PageDTO<ReviewDTO> getAllReviews(@RequestParam(defaultValue = "0") int page) {
-        return new PageDTO<>(reviewService.findAllReviews(page), ReviewDTO::fromEntity);
+    @GetMapping("/{postId}")
+    public List<?> getAllReviewsByPost(UUID postId) {
+        return reviewService.findAllReviewsByPostId(postId);
     }
 
-    @GetMapping("/byUser/{userId}")
-    public PageDTO<ReviewDTO> getAllPostsByUser(@PathVariable UUID userId, int page) {
-        return new PageDTO<>(reviewService.findAllReviewsByUserId(userId, page), ReviewDTO::fromEntity);
+    @GetMapping("/user/{userId}")
+    public List<Review> getAllReviewsByUser(@PathVariable UUID userId) {
+        return reviewService.findAllReviewsByUserId(userId);
     }
 
-    @GetMapping("/byTitle")
-    public PageDTO<ReviewDTO> getAllPostsBTitle(String title, int page) {
-        return new PageDTO<>(reviewService.findAllReviewByTitleLike(title, page), ReviewDTO::fromEntity);
+    @GetMapping("/titles/{title}")
+    public List<Review> getAllReviewsByTitle(@PathVariable String title) {
+        return reviewService.findAllReviewsByTitle(title);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteReview(@PathVariable UUID id) {
-        reviewService.deleteReview(id);
+    @GetMapping("/most-like")
+    public List<Review> getAllReviewsMostLikes(UUID postId) {
+        return reviewService.findAllReviewsByOrderByLikesDesc(postId);
     }
 
-    @PostMapping
-    public ReviewDTO createReview(@RequestBody ReviewDTO reviewDTO) {
-        return ReviewDTO.fromEntity(reviewService.createReview(reviewDTO.toEntity()));
-    }
-
-    @PutMapping("/{id}")
-    public ReviewDTO updateReview(@PathVariable UUID id, @RequestBody ReviewDTO reviewDTO) {
-        return ReviewDTO.fromEntity(reviewService.updateReview(id, reviewDTO.toEntity()));
+    @GetMapping("/most-dislike")
+    public List<Review> getAllReviewsMostDislikes(UUID postId) {
+        return reviewService.findAllReviewsByOrderByDislikesDesc(postId);
     }
 }

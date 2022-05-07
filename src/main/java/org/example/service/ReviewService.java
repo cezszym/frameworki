@@ -1,23 +1,39 @@
 package org.example.service;
 
+import org.example.entity.Post;
 import org.example.entity.Review;
-import org.springframework.data.domain.Page;
+import org.example.repository.ReviewRepository;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
-public interface ReviewService {
+@Service
+public class ReviewService{
 
-    Review createReview(Review review);
+    private final ReviewRepository reviewRepository;
 
-    Review updateReview(UUID id, Review review);
+    public ReviewService(ReviewRepository reviewRepository) {
+        this.reviewRepository = reviewRepository;
+    }
 
-    void deleteReview(UUID id);
+    public List<Review> findAllReviewsByPostId(UUID id) {
+        return reviewRepository.getAllReviewsByPost(id);
+    }
 
-    Review findReviewById(UUID id);
+    public List<Review> findAllReviewsByUserId(UUID id) {
+        return reviewRepository.getAllReviewsByUser(id);
+    }
 
-    Page<Review> findAllReviewsByUserId(UUID id, int page);
+    public List<Review> findAllReviewsByTitle(String title) {
+        return reviewRepository.getAllReviewsByTitle(title);
+    }
 
-    Page<Review> findAllReviewByTitleLike(String title, int page);
+    public List<Review> findAllReviewsByOrderByLikesDesc(UUID postId) {
+        return reviewRepository.findAllReviewsByPostOrderByLikesDesc(postId);
+    }
 
-    Page<Review> findAllReviews(int page);
+    public List<Review> findAllReviewsByOrderByDislikesDesc(UUID postId) {
+        return reviewRepository.findAllReviewsByPostOrderByDislikesDesc(postId);
+    }
 }
