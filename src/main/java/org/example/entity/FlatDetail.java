@@ -9,13 +9,13 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.UUID;
 
-@Table(name = "flat_details")
+@Table(name = "flat_detail")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class FlatDetails {
+public class FlatDetail {
     @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

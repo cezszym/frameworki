@@ -22,15 +22,13 @@ public class Flat {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NotNull
     @OneToOne
     @JoinColumn(name = "flat_details_id")
-    private FlatDetails flatDetails;
+    private FlatDetail flatDetail;
 
     @NotNull
     private String adress;
