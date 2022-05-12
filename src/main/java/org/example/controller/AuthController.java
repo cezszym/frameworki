@@ -15,7 +15,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
 
 
 @RestController
@@ -54,7 +58,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody SignUpDto signUpDto){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpDto signUpDto){
 
 
         if(userRepository.existsByNick(signUpDto.getNick())){

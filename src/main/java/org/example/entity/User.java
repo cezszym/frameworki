@@ -8,6 +8,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Getter
