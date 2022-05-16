@@ -12,21 +12,9 @@ import java.util.UUID;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
 
-    List<Reservation> getAllReservationsByUser(UUID userId);
-    Reservation getReservationByUserAndId(UUID userId, UUID reservationId);
-    List<Reservation> getAllReservationsByUserAndStatus(UUID userId, ReservationStatus reservationStatus);
-//    void updateReservation(UUID id, Reservation reservation);
-    void deleteById(UUID id);
-
-
-
-//
-//
-//    Optional<List<Reservation>> findByStatus(ReservationStatus reservationStatus);
-//
-//    Reservation save(Reservation reservation);
-//
-//    void deleteById(UUID id);
-//
-//    void updateById(UUID id, Reservation reservation);
+    List<Reservation> getAllReservationsByUser(User user);
+    Reservation getReservationByUserAndId(User user, UUID reservationId);
+    List<Reservation> getAllReservationsByUserAndStatus(User user, ReservationStatus reservationStatus);
+    void deleteById(UUID reservationId);
+    void deleteAllReservationsByUser(User user);
 }
