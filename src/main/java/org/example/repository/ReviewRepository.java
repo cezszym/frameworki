@@ -1,6 +1,8 @@
 package org.example.repository;
 
+import org.example.entity.Post;
 import org.example.entity.Review;
+import org.example.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,13 +12,17 @@ import java.util.UUID;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
-    Review findReviewById(UUID id);
+    void deleteById(UUID reservationId);
 
-    List<Review> getAllReviewsByPost(UUID postId);
+    void deleteAllReviewsByUser(User user);
 
-    List<Review> getAllReviewsByUser(UUID userId);
+    List<Review> getAllReviewsByPost(Post post);
+
+    List<Review> getAllReviewsByUser(User user);
 
     List<Review> getAllReviewsByTitle(String title);
+
+    Review getReviewByUserAndId(User user, UUID reviewId);
 
     List<Review> findAllReviewsByPostOrderByLikesDesc(UUID postId);
 
