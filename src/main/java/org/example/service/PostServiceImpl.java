@@ -1,20 +1,28 @@
 package org.example.service;
 
 import org.example.entity.Post;
+import org.example.entity.Review;
 import org.example.repository.PostRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.example.repository.UserRepository;
+import org.example.security.Identity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final Identity identity;
 
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, UserRepository userRepository1, Identity identity) {
         this.postRepository = postRepository;
+        this.userRepository = userRepository1;
+        this.identity = identity;
     }
 
     @Override
@@ -31,8 +39,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void deletePost(UUID id) {
-        postRepository.delete(findPostById(id));
+    public ResponseEntity<?> deletePost(UUID id) {
+        try {
+            postRepository.deleteById(id);
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
@@ -41,17 +54,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<Post> findAllPostByTitleLike(String title, int page) {
-        return postRepository.findAllByTitleContainingIgnoreCase(Pageable.ofSize(10).withPage(Math.max(page, 0)), title);
+    public List<Post> findPostsByUserId(UUID id) {
+        return postRepository.findAllByUserId(id);
     }
 
     @Override
-    public Page<Post> findAllPosts(int page) {
-        return postRepository.findAll(Pageable.ofSize(10).withPage(Math.max(page, 0)));
+    public List<Post> findMyPosts() {
+        return postRepository.findAllByUserId(this.identity.getCurrent().getId());
     }
 
-    @Override
-    public Page<Post> findAllPostsByUserId(UUID id, int page) {
-        return postRepository.findAllByUserId(Pageable.ofSize(10).withPage(Math.max(page, 0)), id);
-    }
 }
