@@ -26,6 +26,10 @@ public class FlatDetail {
     @JoinColumn(name = "flat_id")
     private Flat flat;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @NotNull
     private Boolean kitchen;
 
