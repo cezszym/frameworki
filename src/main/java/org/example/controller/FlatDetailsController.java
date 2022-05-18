@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@RequestMapping("/api/flats")
+@RequestMapping("/api/flat_details")
 @RestController
 public class FlatDetailsController {
     private final FlatDetailRepository flatDetailRepository;
@@ -71,5 +71,15 @@ public class FlatDetailsController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/count")
+    public ResponseEntity<?> count(){
+        try{
+            return ResponseEntity.ok(this.flatDetailRepository.count());
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }

@@ -29,11 +29,9 @@ public class FlatController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> save(@RequestBody Flat flat){
+    public ResponseEntity<Flat> save(@RequestBody Flat flat){
         try{
-            flat.setUser(this.userRepository.getById(this.identity.getCurrent().getId()));
-            this.flatRepository.save(flat);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return ResponseEntity.ok(this.flatRepository.save(flat));
         } catch(Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -47,24 +45,16 @@ public class FlatController {
             if (!this.userRepository.getById(this.identity.getCurrent().getId()).equals(flatToDelete.getUser().getId())) {
                 return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
             }
-            this.flatRepository.deleteById(flatId);
-            return new ResponseEntity<>("Deleted", HttpStatus.OK);
+            return ResponseEntity.ok("Deleted");
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping("/edit/{flatId}")
-    public ResponseEntity<?> editById(@PathVariable("flatId") UUID flatId, @RequestBody Flat flat){
+    @GetMapping("/count")
+    public ResponseEntity<?> count(){
         try{
-            Flat flatToEdit = this.flatRepository.getById(flatId);
-            if(flatToEdit == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            if (!this.userRepository.getById(this.identity.getCurrent().getId()).equals(flatToEdit.getUser().getId())) {
-                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-            }
-            this.flatRepository.deleteById(flatId);
-            this.flatRepository.save(flat);
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            return ResponseEntity.ok(this.flatRepository.count());
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
