@@ -1,6 +1,8 @@
 package org.example.controller;
 
 import org.example.entity.Post;
+import org.example.model.PostDTO;
+import org.example.model.PostListDTO;
 import org.example.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,23 +27,23 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPost(@PathVariable UUID id) {
-        return ResponseEntity.ok(postService.findPostById(id));
+    public PostDTO getPost(@PathVariable UUID id) {
+        return PostDTO.fromEntity(postService.findPostById(id));
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<Post>> getUserPosts(@PathVariable UUID id) {
-        return ResponseEntity.ok(postService.findPostsByUserId(id));
+    public PostListDTO getUserPosts(@PathVariable UUID id) {
+        return PostListDTO.fromEntityList(postService.findPostsByUserId(id));
     }
 
     @PostMapping("/")
-    public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        return ResponseEntity.ok(postService.createPost(post));
+    public PostDTO createPost(@RequestBody PostDTO postDTO) {
+        return PostDTO.fromEntity(postService.createPost(postDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable UUID id, @RequestBody Post post) {
-        return ResponseEntity.ok(postService.updatePost(id, post));
+    public PostDTO updatePost(@PathVariable UUID id, @RequestBody PostDTO postDTO) {
+        return PostDTO.fromEntity(postService.updatePost(id, postDTO));
     }
 
     @DeleteMapping("/{id}")

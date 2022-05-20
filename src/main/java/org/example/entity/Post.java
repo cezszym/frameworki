@@ -3,8 +3,10 @@ package org.example.entity;
 
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -12,6 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "post")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Post {
