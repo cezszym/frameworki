@@ -2,10 +2,7 @@ package org.example.entity;
 
 
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.other.ReservationStatus;
 import org.springframework.stereotype.Repository;
 
@@ -15,10 +12,10 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "reservation")
 public class Reservation {
     @Id
     @NotNull
@@ -26,23 +23,21 @@ public class Reservation {
     private UUID id;
 
     // Relacja 'wiele rezerwacji do pojedynczych postów'
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 
     // Relacja 'wiele rezerwacji do pojedynczych użytkowników'
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @NotNull
-    private Date startDate;
+    private Date start;
     @NotNull
-    private Date endDate;
+    private Date end;
     @NotNull
     private ReservationStatus status;
     @NotNull
-    private Date createDate;
+    private Date created;
 }
