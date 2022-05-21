@@ -10,6 +10,8 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@Builder
+@Data
 @Table(name = "review")
 @AllArgsConstructor
 @NoArgsConstructor
