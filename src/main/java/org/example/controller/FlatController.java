@@ -1,9 +1,8 @@
 package org.example.controller;
 
-import org.example.entity.Flat;
-import org.example.entity.Reservation;
-import org.example.entity.Review;
-import org.example.other.ReservationStatus;
+import org.example.entity.*;
+import org.example.model.FlatDTO;
+import org.example.repository.FlatDetailRepository;
 import org.example.repository.FlatRepository;
 import org.example.repository.UserRepository;
 import org.example.security.Identity;
@@ -12,26 +11,41 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @RequestMapping("/api/flats")
 @RestController
 public class FlatController {
     private final FlatRepository flatRepository;
+    private final FlatDetailRepository flatDetailRepository;
     private final UserRepository userRepository;
     private final Identity identity;
 
-    public FlatController(final FlatRepository flatRepository, final UserRepository userRepository, Identity identity){
+    public FlatController(final FlatRepository flatRepository, FlatDetailRepository flatDetailRepository, final UserRepository userRepository, Identity identity){
         this.flatRepository = flatRepository;
+        this.flatDetailRepository = flatDetailRepository;
         this.userRepository = userRepository;
         this.identity = identity;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Flat> save(@RequestBody Flat flat){
+    public ResponseEntity<Flat> save(@RequestBody FlatDTO flatDTO){
+        User user = this.userRepository.getById(this.identity.getCurrent().getId());
+        Flat tempFlat = this.flatRepository.getById(flatDTO.getId());
+        FlatDetail flatDetail = this.flatDetailRepository.getFlatDetailByFlat(tempFlat);
+
+        if(flatDetail == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
         try{
-            return ResponseEntity.ok(this.flatRepository.save(flat));
+            Flat flat = this.flatRepository.save(Flat.builder().
+                    user(user).flatDetail(flatDetail).
+                    adress(flatDTO.getAdress()).
+                    postCode(flatDTO.getPostCode()).
+                    city(flatDTO.getCity()).
+                    country(flatDTO.getCountry()).
+                    metrage(flatDTO.getMetrage()).
+                    numOfRooms(flatDTO.getNumOfRooms()).build());
+            return new ResponseEntity<>(flat,HttpStatus.CREATED);
         } catch(Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

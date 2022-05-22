@@ -1,10 +1,7 @@
 package org.example.entity;
 
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -12,6 +9,8 @@ import java.util.UUID;
 @Table(name = "flat_detail")
 @Getter
 @Setter
+@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -41,7 +40,4 @@ public class FlatDetail {
 
     @NotNull
     private Boolean wifi;
-
-
-
 }

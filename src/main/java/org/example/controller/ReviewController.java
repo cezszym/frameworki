@@ -82,7 +82,7 @@ public class ReviewController {
     }
 
 
-    @GetMapping("/post/{postId}/likes")
+    @GetMapping("/post/likes/{postId}")
     public ResponseEntity<List<Review>> findAllReviewsByPostOrderByLikesDesc(@PathVariable("postId") UUID postId){
 
         try {
@@ -97,7 +97,7 @@ public class ReviewController {
     }
 
 
-    @GetMapping("/post/{postId}/dislikes")
+    @GetMapping("/post/dislikes/{postId}")
     public ResponseEntity<List<Review>> findAllReviewsByPostOrderByDislikesDesc(@PathVariable("postId") UUID postId){
 
         try {
@@ -139,7 +139,7 @@ public class ReviewController {
                     exposureDate(reviewDTO.getExposureDate()).
                     likes(reviewDTO.getLikes()).
                     dislikes(reviewDTO.getDislikes()).build());
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(review,HttpStatus.CREATED);
         } catch(Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
