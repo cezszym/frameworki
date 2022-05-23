@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.example.dto.JWTAuthResponse;
 import org.example.dto.LoginDto;
 import org.example.dto.SignUpDto;
@@ -15,11 +16,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
 
 
 @RestController
@@ -38,6 +37,7 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider tokenProvider;
 
+    @Operation(summary = "Signup user to EasyHotel")
     @PostMapping("/signin")
     public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto){
         try {
@@ -57,6 +57,7 @@ public class AuthController {
 
     }
 
+    @Operation(summary = "Signin user to EasyHotel")
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpDto signUpDto){
 
