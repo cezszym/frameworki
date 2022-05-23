@@ -31,21 +31,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = getJWTfromRequest(request);
 
+        try {
+            if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
 
-        if(StringUtils.hasText(token) && tokenProvider.validateToken(token)){
+                String username = tokenProvider.getUsernameFromJWT(token);
 
-            String username = tokenProvider.getUsernameFromJWT(token);
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        } catch (Exception e) {
 
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        } finally {
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
+
     }
 
 

@@ -33,14 +33,14 @@ public class FlatController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> getAllFlats(){
+    public ResponseEntity<?> getAll(){
         try {
             // Authorize user
             User user = identity.getCurrent();
             if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
             ArrayList<Flat> flats = new ArrayList<>(this.flatRepository.getAllByUser(user));
-            if (flats.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            if (flats.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             return new ResponseEntity<>(flats, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -48,7 +48,7 @@ public class FlatController {
     }
 
     @GetMapping("/{flatId}")
-    public ResponseEntity<?> getFlatById(@PathVariable("flatId") UUID id){
+    public ResponseEntity<?> getById(@PathVariable("flatId") UUID id){
         try {
             // Authorize user
             User user = identity.getCurrent();
@@ -70,7 +70,7 @@ public class FlatController {
             User user = identity.getCurrent();
             if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-            return new ResponseEntity<>(this.flatRepository.count(), HttpStatus.OK);
+            return new ResponseEntity<>(this.flatRepository.getAllByUser(user).size(), HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -99,6 +99,9 @@ public class FlatController {
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
+        // FlatWrapper is used to receive two objects (by default @RequestBody is mapped to only one object)
+        // Note that JSON object notation in this case requires creation of dictionary where key is name of the object class
+        // and value is body of this object (Postman -> (Collection) Flats -> (Request) CREATE flat)
         FlatDTO flatDTO = flatWrapper.getFlatDTO();
         FlatDetailDTO flatDetailDTO = flatWrapper.getFlatDetailDTO();
 
@@ -126,14 +129,18 @@ public class FlatController {
     }
 
     @PutMapping("/{flatId}")
-    public ResponseEntity<Flat> update(@PathVariable("flatId") UUID id, @RequestBody FlatDTO flatDTO, @RequestBody FlatDetailDTO flatDetailDTO){
+    public ResponseEntity<Flat> update(@PathVariable("flatId") UUID id, @RequestBody FlatWrapper flatWrapper){
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
+        // Description available in save method (above)
+        FlatDTO flatDTO = flatWrapper.getFlatDTO();
+        FlatDetailDTO flatDetailDTO = flatWrapper.getFlatDetailDTO();
+
         try{
             // Delete existing flat details and flat
-            deleteById(id);
+            delete(id);
 
             // Add new ones
             FlatDetail flatDetail = this.flatDetailRepository.save(FlatDetail.builder().
@@ -152,14 +159,14 @@ public class FlatController {
                     metrage(flatDTO.getMetrage()).
                     numOfRooms(flatDTO.getNumOfRooms()).build());
 
-            return new ResponseEntity<>(flat, HttpStatus.CREATED);
+            return new ResponseEntity<>(flat, HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{flatId}")
-    public ResponseEntity<?> deleteById(@PathVariable("flatId") UUID flatId){
+    public ResponseEntity<?> delete(@PathVariable("flatId") UUID flatId){
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -170,12 +177,12 @@ public class FlatController {
 
         try{
             // Get flatdetails object id to be deleted
-            UUID flatDetailId = flat.getFlatDetail().getId();
+            FlatDetail flatDetail = flat.getFlatDetail();
 
+            // Delete flat object - FIRST!
+            this.flatRepository.delete(flat);
             // Delete flatdetails object
-            this.flatDetailRepository.deleteById(flatDetailId);
-            // Delete flat object
-            this.flatRepository.deleteById(flat.getId());
+            this.flatDetailRepository.delete(flatDetail);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

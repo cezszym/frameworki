@@ -1,13 +1,19 @@
 package org.example.controller;
 
+import org.example.entity.Flat;
 import org.example.entity.Post;
+import org.example.entity.User;
 import org.example.model.PostDTO;
-import org.example.model.PostListDTO;
-import org.example.service.PostService;
+import org.example.repository.FlatRepository;
+import org.example.repository.PostRepository;
+import org.example.repository.UserRepository;
+import org.example.security.Identity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,40 +21,127 @@ import java.util.UUID;
 @RequestMapping("/api/post")
 public class PostController {
 
-    private final PostService postService;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final FlatRepository flatRepository;
+    private final Identity identity;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
+    public PostController(PostRepository postRepository, UserRepository userRepository, UserRepository userRepository1, FlatRepository flatRepository, Identity identity) {
+        this.postRepository = postRepository;
+        this.userRepository = userRepository;
+        this.flatRepository = flatRepository;
+        this.identity = identity;
     }
 
-    @GetMapping("/myPosts")
-    public ResponseEntity<List<Post>> getMyPosts() {
-        return ResponseEntity.ok(postService.findMyPosts());
+    @GetMapping("/")
+    public ResponseEntity<?> getAll() {
+        try {
+            List<Post> posts = new ArrayList<>(this.postRepository.getAll());
+            if(posts.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(posts, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
-    public PostDTO getPost(@PathVariable UUID id) {
-        return PostDTO.fromEntity(postService.findPostById(id));
+    public ResponseEntity<?> getById(@PathVariable("id") UUID id) {
+        try {
+            // Authorize user
+            User user = identity.getCurrent();
+            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+            Post post = this.postRepository.getByUserAndId(user, id);
+            if(post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+            return new ResponseEntity<>(post, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/user/{id}")
-    public PostListDTO getUserPosts(@PathVariable UUID id) {
-        return PostListDTO.fromEntityList(postService.findPostsByUserId(id));
+    public ResponseEntity<?> getUserPosts(@PathVariable("id") UUID id) {
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        try {
+            List<Post> posts = new ArrayList<>(this.postRepository.getAllByUser(user));
+            if(posts.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(posts, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PostMapping("/")
-    public PostDTO createPost(@RequestBody PostDTO postDTO) {
-        return PostDTO.fromEntity(postService.createPost(postDTO));
+    @PostMapping("/{flatId}")
+    public ResponseEntity<?> createPost(@PathVariable("flatId") UUID id, @RequestBody PostDTO postDTO) {
+        // Authorize user
+        User user = this.identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        Flat flat = this.flatRepository.getByUserAndId(user, id);
+
+        try{
+            Post post = postRepository.save(Post.builder().flat(flat)
+                    .user(user)
+                    .title(postDTO.getTitle())
+                    .description(postDTO.getDescription())
+                    .price(postDTO.getPrice())
+                    .promoted(postDTO.isPromoted())
+                    .created(postDTO.getCreated())
+                    .expired(postDTO.getExpired())
+                    .build());
+
+            return new ResponseEntity<>(post, HttpStatus.CREATED);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
-    public PostDTO updatePost(@PathVariable UUID id, @RequestBody PostDTO postDTO) {
-        return PostDTO.fromEntity(postService.updatePost(id, postDTO));
+    public ResponseEntity<?> updatePost(@PathVariable("id") UUID id, @RequestBody PostDTO postDTO) {
+        // Authorize user
+        User user = this.identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        Flat flat = this.flatRepository.getByUserAndId(user, id);
+
+        try{
+            delete(id);
+
+            Post post = postRepository.save(Post.builder().flat(flat)
+                    .user(user)
+                    .title(postDTO.getTitle())
+                    .description(postDTO.getDescription())
+                    .price(postDTO.getPrice())
+                    .promoted(postDTO.isPromoted())
+                    .created(postDTO.getCreated())
+                    .expired(postDTO.getExpired())
+                    .build());
+
+            return new ResponseEntity<>(post, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable UUID id) {
-        return postService.deletePost(id);
-    }
+    public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
+        // Check if user has permissions to delete this flat
+        Post post = this.postRepository.getByUserAndId(user, id);
+        if (post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+        try{
+            this.postRepository.delete(post);
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

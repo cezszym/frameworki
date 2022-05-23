@@ -4,10 +4,10 @@ import org.example.entity.Post;
 import org.example.entity.Review;
 import org.example.entity.User;
 import org.example.model.ReviewDTO;
+import org.example.repository.PostRepository;
 import org.example.repository.ReviewRepository;
 import org.example.repository.UserRepository;
 import org.example.security.Identity;
-import org.example.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,18 +22,22 @@ import java.util.UUID;
 public class ReviewController {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
-    private final PostService postService;
+    private final PostRepository postRepository;
     private final Identity identity;
 
-    public ReviewController(final ReviewRepository reviewRepository, final UserRepository userRepository, PostService postService, Identity identity){
+    public ReviewController(final ReviewRepository reviewRepository, final UserRepository userRepository, PostRepository postRepository, Identity identity){
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
-        this.postService = postService;
+        this.postRepository = postRepository;
         this.identity = identity;
     }
 
     @GetMapping("/")
     public ResponseEntity<List<Review>> getAllByUser(){
+
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         try {
             // first, take current user's ID, then get user from database and put into getAllReservationsByUser
@@ -52,7 +56,7 @@ public class ReviewController {
         try {
             // first, take current user's ID, then get user from database and put into getAllReservationsByUser
             ArrayList<Review> reviews = new ArrayList<>();
-            List<Post> tempList= this.postService.findPostsByUserId(this.identity.getCurrent().getId());
+            List<Post> tempList= this.postRepository.getAllByUser(this.identity.getCurrent().getId());
             for (Post element : tempList) {
                 if(element.getTitle().equals(title)){
                     reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByPost(element));

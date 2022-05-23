@@ -23,7 +23,7 @@ public class Flat {
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "flat_detail_id")
+    @JoinColumn(name = "flatdetail_id")
     private FlatDetail flatDetail;
 
     @NotNull

@@ -12,6 +12,5 @@ import java.util.UUID;
 public interface FlatRepository extends JpaRepository<Flat, UUID> {
     List<Flat> getAllByUser(User user);
     Flat getByUserAndId(User user, UUID id);
-    void deleteById(UUID reservationId);
     Flat findByUserAndId(User user, UUID id);
 }

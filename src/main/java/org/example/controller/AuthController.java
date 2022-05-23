@@ -50,7 +50,7 @@ public class AuthController {
             String token = tokenProvider.generateToken(authentication);
             return ResponseEntity.ok(new JWTAuthResponse(token));
         } catch (AuthenticationException e){
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
