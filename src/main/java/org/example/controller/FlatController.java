@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.example.entity.Flat;
 import org.example.entity.FlatDetail;
 import org.example.entity.User;
@@ -30,6 +31,7 @@ public class FlatController {
         this.identity = identity;
     }
 
+    @Operation(summary = "Get all flats")
     @GetMapping("/")
     public ResponseEntity<?> getAll(){
         try {
@@ -45,6 +47,7 @@ public class FlatController {
         }
     }
 
+    @Operation(summary = "Get flat by id")
     @GetMapping("/{flatId}")
     public ResponseEntity<?> getById(@PathVariable("flatId") UUID id){
         try {
@@ -61,6 +64,7 @@ public class FlatController {
         }
     }
 
+    @Operation(summary = "Get the number of flats")
     @GetMapping("/count")
     public ResponseEntity<?> count(){
         try{
@@ -74,6 +78,7 @@ public class FlatController {
         }
     }
 
+    @Operation(summary = "Get details about the flats by id")
     @GetMapping("/details/{flatId}")
     public ResponseEntity<?> getDetails(@PathVariable("flatId") UUID id){
         try {
@@ -91,6 +96,7 @@ public class FlatController {
         }
     }
 
+    @Operation(summary = "Create flat")
     @PostMapping("/")
     public ResponseEntity<Flat> save(@RequestBody FlatWrapper flatWrapper){
         // Authorize user
@@ -126,6 +132,7 @@ public class FlatController {
         }
     }
 
+    @Operation(summary = "Update flat by id")
     @PutMapping("/{flatId}")
     public ResponseEntity<Flat> update(@PathVariable("flatId") UUID id, @RequestBody FlatWrapper flatWrapper){
         // Authorize user
@@ -166,6 +173,7 @@ public class FlatController {
         }
     }
 
+    @Operation(summary = "Delete flat by id")
     @DeleteMapping("/{flatId}")
     public ResponseEntity<?> delete(@PathVariable("flatId") UUID flatId){
         // Authorize user

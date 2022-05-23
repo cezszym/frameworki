@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.example.entity.Post;
 import org.example.entity.Reservation;
 import org.example.entity.User;
@@ -32,6 +33,7 @@ public class ReservationController {
         this.identity = identity;
     }
 
+    @Operation(summary = "Get all reservations")
     @GetMapping("/")
     public ResponseEntity<List<Reservation>> getAll(){
         // Authorize user
@@ -49,6 +51,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Get reservation by id")
     @GetMapping("/{reservationId}")
     public ResponseEntity<Reservation> getById(@PathVariable("reservationId") UUID reservationId){
         // Authorize user
@@ -64,6 +67,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Get all reservations by status")
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Reservation>> getAllByStatus(@PathVariable("status") ReservationStatus status){
         // Authorize user
@@ -81,14 +85,15 @@ public class ReservationController {
         }
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> save(@RequestBody ReservationDTO reservationDTO){
+    @Operation(summary = "Create reservation")
+    @PostMapping("/{postId}")
+    public ResponseEntity<?> save(@PathVariable("postId") UUID postId, @RequestBody ReservationDTO reservationDTO){
 
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        Post post = this.postRepository.getByUserAndId(user, reservationDTO.getPostDTO().getId());
+        Post post = this.postRepository.getByUserAndId(user, postId);
         if(post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         try{
@@ -105,6 +110,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Update reservation by id")
     @PutMapping("/{reservationId}")
     public ResponseEntity<?> update(@PathVariable("reservationId") UUID reservationId, @RequestBody ReservationDTO reservationDTO){
 
@@ -112,8 +118,10 @@ public class ReservationController {
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        Post post = this.postRepository.getByUserAndId(user, reservationDTO.getPostDTO().getId());
-        if(post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        Reservation currentReservation = this.reservationRepository.getByUserAndId(user, reservationId);
+        if(currentReservation == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+        Post post = currentReservation.getPost();
 
         try{
             deleteById(reservationId);
@@ -131,6 +139,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Delete reservation by id")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<?> deleteById(@PathVariable("reservationId") UUID reservationId){
         // Authorize user
@@ -148,6 +157,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Delete all reservations")
     @DeleteMapping("/")
     public ResponseEntity<?> deleteAll(){
         // Authorize user
@@ -155,7 +165,32 @@ public class ReservationController {
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         try{
-            this.reservationRepository.deleteByUser(user);
+            List<Reservation> reservations = this.reservationRepository.getAllByUser(user);
+            if(reservations.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+
+            for(Reservation reservation : reservations)
+                this.reservationRepository.delete(reservation);
+
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Delete reservation by status")
+    @DeleteMapping("/status/{status}")
+    public ResponseEntity<?> deleteByStatus(@PathVariable("status") ReservationStatus status){
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        try{
+            List<Reservation> reservations = this.reservationRepository.getAllByUserAndStatus(user, status);
+            if(reservations.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+
+            for(Reservation reservation : reservations)
+                this.reservationRepository.delete(reservation);
+
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
