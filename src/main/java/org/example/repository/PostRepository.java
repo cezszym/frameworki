@@ -11,7 +11,7 @@ import java.util.UUID;
 @Repository
 public interface PostRepository extends JpaRepository<Post, UUID> {
 
-    List<Post> getAll();
+    List<Post> findAll();
     List<Post> getAllByUser(User user);
     Post getByUserAndId(User user, UUID id);
     void deleteById(UUID id);
