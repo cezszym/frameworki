@@ -3,6 +3,7 @@ package org.example.controller;
 import org.example.entity.Post;
 import org.example.entity.Review;
 import org.example.entity.User;
+import org.example.model.PostDTO;
 import org.example.model.ReviewDTO;
 import org.example.repository.PostRepository;
 import org.example.repository.ReviewRepository;
@@ -35,13 +36,12 @@ public class ReviewController {
     @GetMapping("/")
     public ResponseEntity<List<Review>> getAllByUser(){
 
-        // Authorize user
-        User user = identity.getCurrent();
-        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-
         try {
-            // first, take current user's ID, then get user from database and put into getAllReservationsByUser
-            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByUser(this.userRepository.getById(this.identity.getCurrent().getId())));
+            // Authorize user
+            User user = identity.getCurrent();
+            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByUser(user));
 
             if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             return new ResponseEntity<>(reviews, HttpStatus.OK);
@@ -50,50 +50,60 @@ public class ReviewController {
         }
     }
 
-    @GetMapping("/post/{title}")
-    public ResponseEntity<List<Review>> getAllByPostTitle(@PathVariable("title") String title){
+//    @GetMapping("/post/{title}")
+//    public ResponseEntity<List<Review>> getAllByPostTitle(@PathVariable("title") String title){
+//
+//        try {
+//            // Authorize user
+//            User user = identity.getCurrent();
+//            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+//
+//            List<Post> reviews = new ArrayList<>(this.postRepository.getAllByUser(user));
+//
+//            for (Post element : tempList) {
+//                if(element.getTitle().equals(title)){
+//                    reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByPost(element));
+//                    if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//                    return new ResponseEntity<>(reviews, HttpStatus.OK);
+//                }
+//            }
+//
+//            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+//        } catch(Exception e) {
+//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
-        try {
-            // first, take current user's ID, then get user from database and put into getAllReservationsByUser
-            ArrayList<Review> reviews = new ArrayList<>();
-            List<Post> tempList= this.postRepository.getAllByUser(this.identity.getCurrent().getId());
-            for (Post element : tempList) {
-                if(element.getTitle().equals(title)){
-                    reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByPost(element));
-                    if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-                    return new ResponseEntity<>(reviews, HttpStatus.OK);
-                }
-            }
-
-            return new ResponseEntity<>(reviews, HttpStatus.OK);
-        } catch(Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/review/{title}")
-    public ResponseEntity<List<Review>> getAllReviewsByTitle(@PathVariable("title") String title){
-
-        try {
-            // first, take current user's ID, then get user from database and put into getAllReservationsByUser
-            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByTitle(title));
-
-            if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            return new ResponseEntity<>(reviews, HttpStatus.OK);
-        } catch(Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @GetMapping("/review/{title}")
+//    public ResponseEntity<List<Review>> getAllReviewsByTitle(@PathVariable("title") String title){
+//
+//        try {
+//            // Authorize user
+//            User user = identity.getCurrent();
+//            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+//
+//            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByTitle(title));
+//
+//            if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//            return new ResponseEntity<>(reviews, HttpStatus.OK);
+//        } catch(Exception e) {
+//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
 
     @GetMapping("/post/likes/{postId}")
     public ResponseEntity<List<Review>> findAllReviewsByPostOrderByLikesDesc(@PathVariable("postId") UUID postId){
 
         try {
-            // first, take current user's ID, then get user from database and put into getAllReservationsByUser
+            // Authorize user
+            User user = identity.getCurrent();
+            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
             ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByLikesDesc(postId));
 
             if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
             return new ResponseEntity<>(reviews, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -105,10 +115,12 @@ public class ReviewController {
     public ResponseEntity<List<Review>> findAllReviewsByPostOrderByDislikesDesc(@PathVariable("postId") UUID postId){
 
         try {
-            // first, take current user's ID, then get user from database and put into getAllReservationsByUser
-            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByDislikesDesc(postId));
+            // Authorize user
+            User user = identity.getCurrent();
+            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-            if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByDislikesDesc(postId));
+            if (reviews.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             return new ResponseEntity<>(reviews, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -116,11 +128,15 @@ public class ReviewController {
     }
 
 
-    @GetMapping("/{reservationId}")
-    public ResponseEntity<Review> getById(@PathVariable("reservationId") UUID reviewId){
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<Review> getById(@PathVariable("reviewId") UUID reviewId){
         try{
-            Review review = this.reviewRepository.getReviewByUserAndId(this.userRepository.getById(this.identity.getCurrent().getId()), reviewId);
-            if(review == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            // Authorize user
+            User user = identity.getCurrent();
+            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+            Review review = this.reviewRepository.getReviewByUserAndId(user, reviewId);
+            if(review == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             return new ResponseEntity<>(review, HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -130,10 +146,11 @@ public class ReviewController {
     @PostMapping("/")
     public ResponseEntity<?> save(@RequestBody ReviewDTO reviewDTO){
 
-        User user = this.userRepository.getById(this.identity.getCurrent().getId());
-        Post post = this.postService.findPostById(reviewDTO.getPost().getId());
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        if(post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        Post post = this.postRepository.getById(reviewDTO.getPost().getId());
 
         try{
             Review review = this.reviewRepository.save(Review.builder().
@@ -143,23 +160,36 @@ public class ReviewController {
                     exposureDate(reviewDTO.getExposureDate()).
                     likes(reviewDTO.getLikes()).
                     dislikes(reviewDTO.getDislikes()).build());
-            return new ResponseEntity<>(review,HttpStatus.CREATED);
+
+            this.reviewRepository.save(review);
+            return new ResponseEntity<>(review, HttpStatus.CREATED);
         } catch(Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
     @PutMapping("/{reviewId}")
-    public ResponseEntity<?> updateById(@PathVariable("reviewId") UUID reviewId, @RequestBody ReviewDTO reviewDTO){
-        // Check if there is a reservation with given id that belongs to current user
-        User user = this.userRepository.getById(this.identity.getCurrent().getId());
-        Review oldReview = this.reviewRepository.getReviewByUserAndId(user, reviewId);
-        if(oldReview == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> update(@PathVariable("reviewId") UUID reviewId, @RequestBody ReviewDTO reviewDTO){
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        Post post = this.postRepository.getById(reviewDTO.getPost().getId());
 
         try{
-            this.reviewRepository.deleteById(reviewId);
-            return save(reviewDTO);
+            // Delete existing review
+            deleteById(reviewId);
+
+            // Add new ones
+            Review review = this.reviewRepository.save(Review.builder().
+                    post(post).user(user).
+                    title(reviewDTO.getTitle()).
+                    contents(reviewDTO.getContents()).
+                    exposureDate(reviewDTO.getExposureDate()).
+                    likes(reviewDTO.getLikes()).
+                    dislikes(reviewDTO.getDislikes()).build());
+
+            return new ResponseEntity<>(review,HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -168,6 +198,10 @@ public class ReviewController {
 
     @DeleteMapping("/")
     public ResponseEntity<?> deleteAll(){
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
         try{
             this.reviewRepository.deleteAllReviewsByUser(this.userRepository.getById(this.identity.getCurrent().getId()));
             return new ResponseEntity<>(null, HttpStatus.OK);
@@ -179,9 +213,14 @@ public class ReviewController {
 
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<?> deleteById(@PathVariable("reviewId") UUID reviewId){
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
         try{
-            Review currentReview = this.reviewRepository.getReviewByUserAndId(this.userRepository.getById(this.identity.getCurrent().getId()), reviewId);
-            if(currentReview == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            Review review = this.reviewRepository.getReviewByUserAndId(user, reviewId);
+            if(review == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
             this.reviewRepository.deleteById(reviewId);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e){

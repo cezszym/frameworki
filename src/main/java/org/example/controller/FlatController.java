@@ -120,8 +120,6 @@ public class FlatController {
                     metrage(flatDTO.getMetrage()).
                     numOfRooms(flatDTO.getNumOfRooms()).build());
 
-            this.flatRepository.save(flat);
-            this.flatDetailRepository.save(flatDetail);
             return new ResponseEntity<>(flat, HttpStatus.CREATED);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -159,8 +157,6 @@ public class FlatController {
                     metrage(flatDTO.getMetrage()).
                     numOfRooms(flatDTO.getNumOfRooms()).build());
 
-            this.flatRepository.save(flat);
-            this.flatDetailRepository.save(flatDetail);
             return new ResponseEntity<>(flat, HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

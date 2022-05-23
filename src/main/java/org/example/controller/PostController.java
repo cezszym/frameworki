@@ -36,7 +36,7 @@ public class PostController {
     @GetMapping("/")
     public ResponseEntity<?> getAll() {
         try {
-            List<Post> posts = new ArrayList<>(this.postRepository.getAll());
+            List<Post> posts = new ArrayList<>(this.postRepository.findAll());
             if(posts.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             return new ResponseEntity<>(posts, HttpStatus.OK);
         } catch (Exception e){
@@ -94,7 +94,6 @@ public class PostController {
                     .expired(postDTO.getExpired())
                     .build());
 
-            this.postRepository.save(post);
             return new ResponseEntity<>(post, HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -122,7 +121,6 @@ public class PostController {
                     .expired(postDTO.getExpired())
                     .build());
 
-            this.postRepository.save(post);
             return new ResponseEntity<>(post, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

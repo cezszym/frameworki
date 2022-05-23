@@ -99,7 +99,6 @@ public class ReservationController {
                     status(reservationDTO.getStatus()).
                     created(reservationDTO.getCreated()).build());
 
-            this.reservationRepository.save(reservation);
             return new ResponseEntity<>(reservation, HttpStatus.CREATED);
         } catch(Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -126,7 +125,6 @@ public class ReservationController {
                     status(reservationDTO.getStatus()).
                     created(reservationDTO.getCreated()).build());
 
-            this.reservationRepository.save(reservation);
             return new ResponseEntity<>(reservation, HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
