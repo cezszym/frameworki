@@ -76,7 +76,7 @@ public class PostController {
     }
 
     @PostMapping("/{flatId}")
-    public ResponseEntity<?> createPost(@PathVariable("flatId") UUID id, @RequestBody PostDTO postDTO) {
+    public ResponseEntity<?> save(@PathVariable("flatId") UUID id, @RequestBody PostDTO postDTO) {
         // Authorize user
         User user = this.identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -94,6 +94,7 @@ public class PostController {
                     .expired(postDTO.getExpired())
                     .build());
 
+            this.postRepository.save(post);
             return new ResponseEntity<>(post, HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -121,6 +122,7 @@ public class PostController {
                     .expired(postDTO.getExpired())
                     .build());
 
+            this.postRepository.save(post);
             return new ResponseEntity<>(post, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

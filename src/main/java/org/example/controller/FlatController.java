@@ -22,13 +22,11 @@ import java.util.UUID;
 public class FlatController {
     private final FlatRepository flatRepository;
     private final FlatDetailRepository flatDetailRepository;
-    private final UserRepository userRepository;
     private final Identity identity;
 
-    public FlatController(final FlatRepository flatRepository, FlatDetailRepository flatDetailRepository, final UserRepository userRepository, Identity identity){
+    public FlatController(final FlatRepository flatRepository, FlatDetailRepository flatDetailRepository, Identity identity){
         this.flatRepository = flatRepository;
         this.flatDetailRepository = flatDetailRepository;
-        this.userRepository = userRepository;
         this.identity = identity;
     }
 
@@ -122,6 +120,8 @@ public class FlatController {
                     metrage(flatDTO.getMetrage()).
                     numOfRooms(flatDTO.getNumOfRooms()).build());
 
+            this.flatRepository.save(flat);
+            this.flatDetailRepository.save(flatDetail);
             return new ResponseEntity<>(flat, HttpStatus.CREATED);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -159,6 +159,8 @@ public class FlatController {
                     metrage(flatDTO.getMetrage()).
                     numOfRooms(flatDTO.getNumOfRooms()).build());
 
+            this.flatRepository.save(flat);
+            this.flatDetailRepository.save(flatDetail);
             return new ResponseEntity<>(flat, HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
