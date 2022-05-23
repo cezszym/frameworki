@@ -1,23 +1,23 @@
 package org.example.entity;
 
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
-@Entity
-@Getter
-@Setter
 @Builder
 @Data
-@Table(name = "review")
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
 public class Review {
+
     @Id
-    @NotNull
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 

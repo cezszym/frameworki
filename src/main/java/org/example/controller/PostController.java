@@ -51,38 +51,4 @@ public class PostController {
         return postService.deletePost(id);
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<Post>> getAllPosts() {
-//
-//    }
-//    @GetMapping
-//    public PageDTO<PostDTO> getAllPosts(@RequestParam(defaultValue = "0") int page) {
-//        return new PageDTO<>(postService.findAllPosts(page), PostDTO::fromEntity);
-//    }
-//
-//    @GetMapping("/byUser/{userId}")
-//    public PageDTO<PostDTO> getAllPostsByUser(@PathVariable UUID userId, int page) {
-//        return new PageDTO<>(postService.findAllPostsByUserId(userId, page), PostDTO::fromEntity);
-//    }
-//
-//    @GetMapping("/byTitle")
-//    public PageDTO<PostDTO> getAllPostsBTitle(String title, int page) {
-//        return new PageDTO<>(postService.findAllPostByTitleLike(title, page), PostDTO::fromEntity);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public void deletePost(@PathVariable UUID id) {
-//        postService.deletePost(id);
-//    }
-//
-//    @PostMapping
-//    public PostDTO createPost(@RequestBody PostDTO postDTO) {
-//        return PostDTO.fromEntity(postService.createPost(postDTO.toEntity()));
-//    }
-//
-//    @PutMapping("/{id}")
-//    public PostDTO updatePost(@PathVariable UUID id, @RequestBody PostDTO postDTO) {
-//        return PostDTO.fromEntity(postService.updatePost(id, postDTO.toEntity()));
-//    }
-
 }

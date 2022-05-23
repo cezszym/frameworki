@@ -15,11 +15,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
 
 
 @RestController
@@ -46,25 +47,19 @@ public class AuthController {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // get token form tokenProvider
             String token = tokenProvider.generateToken(authentication);
             return ResponseEntity.ok(new JWTAuthResponse(token));
-        }catch (AuthenticationException e){
-
+        } catch (AuthenticationException e){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
-
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpDto signUpDto){
 
-
         if(userRepository.existsByNick(signUpDto.getNick())){
             return new ResponseEntity<>("Username is already taken!", HttpStatus.BAD_REQUEST);
         }
-
 
         if(userRepository.existsByEmail(signUpDto.getEmail())){
             return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
@@ -78,11 +73,9 @@ public class AuthController {
         user.setPhoneNumber(signUpDto.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
 
-
         userRepository.save(user);
 
         return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
-
     }
 }
 

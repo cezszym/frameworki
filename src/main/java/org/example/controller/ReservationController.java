@@ -5,7 +5,6 @@ import org.example.entity.Reservation;
 import org.example.entity.User;
 import org.example.model.ReservationDTO;
 import org.example.other.ReservationStatus;
-import org.example.repository.PostRepository;
 import org.example.repository.ReservationRepository;
 import org.example.repository.UserRepository;
 import org.example.security.Identity;
@@ -14,8 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @RequestMapping("/api/reservations")
 @RestController
@@ -75,8 +75,6 @@ public class ReservationController {
         User user = this.userRepository.getById(this.identity.getCurrent().getId());
         Post post = this.postService.findPostById(reservationDTO.getPostDTO().getId());
 
-        // TODO: user zawsze jest != NULL
-        if(user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         if(post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         try{

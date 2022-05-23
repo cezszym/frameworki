@@ -13,8 +13,6 @@ import java.util.UUID;
 public class FlatDetailDTO {
 
     private UUID id;
-    private FlatDTO flat;
-    private UserDTO user;
     private Boolean kitchen;
     private Boolean bathroom;
     private Boolean towels;
@@ -22,8 +20,6 @@ public class FlatDetailDTO {
 
     public static FlatDetailDTO fromEntity(FlatDetail flatDetail) {
         return new FlatDetailDTO(flatDetail.getId(),
-                FlatDTO.fromEntity(flatDetail.getFlat()),
-                UserDTO.fromEntity(flatDetail.getUser()),
                 flatDetail.getKitchen(),
                 flatDetail.getBathroom(),
                 flatDetail.getTowels(),

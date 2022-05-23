@@ -6,17 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.UUID;
 
-@Entity
-@Table(name = "post")
-@Data
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Post {
 
     @Id
