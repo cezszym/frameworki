@@ -23,10 +23,6 @@ public class UserDTO {
     private String lastname;
     private String phoneNumber;
     private String password;
-//    private List<Flat> flatList;
-//    private List<Post> postList;
-//    private List<Reservation> reservationList;
-//    private List<Review> reviewList;
 
     public static UserDTO fromEntity(User user) {
         return new UserDTO(user.getId(),
@@ -36,9 +32,5 @@ public class UserDTO {
                 user.getLastname(),
                 user.getPhoneNumber(),
                 user.getPassword());
-//                user.getFlats(),
-//                user.getPosts(),
-//                user.getReservations(),
-//                user.getReviews());
     }
 }

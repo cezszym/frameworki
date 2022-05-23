@@ -3,7 +3,6 @@ package org.example.controller;
 import org.example.entity.Post;
 import org.example.entity.Review;
 import org.example.entity.User;
-import org.example.model.PostDTO;
 import org.example.model.ReviewDTO;
 import org.example.repository.PostRepository;
 import org.example.repository.ReviewRepository;
@@ -50,48 +49,6 @@ public class ReviewController {
         }
     }
 
-//    @GetMapping("/post/{title}")
-//    public ResponseEntity<List<Review>> getAllByPostTitle(@PathVariable("title") String title){
-//
-//        try {
-//            // Authorize user
-//            User user = identity.getCurrent();
-//            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-//
-//            List<Post> reviews = new ArrayList<>(this.postRepository.getAllByUser(user));
-//
-//            for (Post element : tempList) {
-//                if(element.getTitle().equals(title)){
-//                    reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByPost(element));
-//                    if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//                    return new ResponseEntity<>(reviews, HttpStatus.OK);
-//                }
-//            }
-//
-//            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-//        } catch(Exception e) {
-//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-
-//    @GetMapping("/review/{title}")
-//    public ResponseEntity<List<Review>> getAllReviewsByTitle(@PathVariable("title") String title){
-//
-//        try {
-//            // Authorize user
-//            User user = identity.getCurrent();
-//            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-//
-//            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByTitle(title));
-//
-//            if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//            return new ResponseEntity<>(reviews, HttpStatus.OK);
-//        } catch(Exception e) {
-//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-
-
     @GetMapping("/post/likes/{postId}")
     public ResponseEntity<List<Review>> findAllReviewsByPostOrderByLikesDesc(@PathVariable("postId") UUID postId){
 
@@ -136,7 +93,7 @@ public class ReviewController {
             if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
             Review review = this.reviewRepository.getReviewByUserAndId(user, reviewId);
-            if(review == null) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+            if(review == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             return new ResponseEntity<>(review, HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

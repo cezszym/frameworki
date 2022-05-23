@@ -136,6 +136,9 @@ public class FlatController {
         FlatDTO flatDTO = flatWrapper.getFlatDTO();
         FlatDetailDTO flatDetailDTO = flatWrapper.getFlatDetailDTO();
 
+        Flat existingFlat = this.flatRepository.getByUserAndId(user, flatDTO.getId());
+        if(existingFlat == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
         try{
             // Delete existing flat details and flat
             delete(id);

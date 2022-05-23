@@ -6,7 +6,6 @@ import org.example.entity.User;
 import org.example.model.PostDTO;
 import org.example.repository.FlatRepository;
 import org.example.repository.PostRepository;
-import org.example.repository.UserRepository;
 import org.example.security.Identity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +21,11 @@ import java.util.UUID;
 public class PostController {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final FlatRepository flatRepository;
     private final Identity identity;
 
-    public PostController(PostRepository postRepository, UserRepository userRepository, UserRepository userRepository1, FlatRepository flatRepository, Identity identity) {
+    public PostController(PostRepository postRepository, FlatRepository flatRepository, Identity identity) {
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
         this.flatRepository = flatRepository;
         this.identity = identity;
     }
