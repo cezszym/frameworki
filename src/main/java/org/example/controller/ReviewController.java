@@ -58,8 +58,7 @@ public class ReviewController {
             if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
             ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByLikesDesc(postId));
-
-            if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            if (reviews.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
             return new ResponseEntity<>(reviews, HttpStatus.OK);
         } catch(Exception e) {
@@ -78,6 +77,7 @@ public class ReviewController {
 
             ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByDislikesDesc(postId));
             if (reviews.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+
             return new ResponseEntity<>(reviews, HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -94,20 +94,22 @@ public class ReviewController {
 
             Review review = this.reviewRepository.getReviewByUserAndId(user, reviewId);
             if(review == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
             return new ResponseEntity<>(review, HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> save(@RequestBody ReviewDTO reviewDTO){
+    @PostMapping("/{postId}")
+    public ResponseEntity<?> save(@PathVariable("postId") UUID id, @RequestBody ReviewDTO reviewDTO){
 
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        Post post = this.postRepository.getById(reviewDTO.getPost().getId());
+        Post post = this.postRepository.getByUserAndId(user, id);
+        if(post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         try{
             Review review = this.reviewRepository.save(Review.builder().
@@ -118,7 +120,6 @@ public class ReviewController {
                     likes(reviewDTO.getLikes()).
                     dislikes(reviewDTO.getDislikes()).build());
 
-            this.reviewRepository.save(review);
             return new ResponseEntity<>(review, HttpStatus.CREATED);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -131,7 +132,10 @@ public class ReviewController {
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        Post post = this.postRepository.getById(reviewDTO.getPost().getId());
+        Review currentReview = this.reviewRepository.getReviewByUserAndId(user, reviewId);
+        if(currentReview == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+        Post post = currentReview.getPost();
 
         try{
             // Delete existing review
@@ -152,22 +156,6 @@ public class ReviewController {
         }
     }
 
-
-    @DeleteMapping("/")
-    public ResponseEntity<?> deleteAll(){
-        // Authorize user
-        User user = identity.getCurrent();
-        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-
-        try{
-            this.reviewRepository.deleteAllReviewsByUser(this.userRepository.getById(this.identity.getCurrent().getId()));
-            return new ResponseEntity<>(null, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<?> deleteById(@PathVariable("reviewId") UUID reviewId){
         // Authorize user
@@ -182,6 +170,20 @@ public class ReviewController {
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/")
+    public ResponseEntity<?> deleteAll(){
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        try{
+            this.reviewRepository.deleteAllReviewsByUser(this.userRepository.getById(this.identity.getCurrent().getId()));
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

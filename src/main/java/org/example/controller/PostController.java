@@ -79,6 +79,7 @@ public class PostController {
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         Flat flat = this.flatRepository.getByUserAndId(user, id);
+        if(flat == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         try{
             Post post = postRepository.save(Post.builder().flat(flat)
@@ -103,7 +104,8 @@ public class PostController {
         User user = this.identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        Flat flat = this.flatRepository.getByUserAndId(user, id);
+        Flat flat = this.postRepository.getByUserAndId(user, id).getFlat();
+        if(flat == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         try{
             delete(id);
