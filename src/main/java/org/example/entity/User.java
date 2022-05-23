@@ -2,24 +2,22 @@ package org.example.entity;
 
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
 
-@Entity
-@Getter
-@Setter
-@AllArgsConstructor
+@Builder
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
 public class User {
 
     @Id
-    @NotNull
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
@@ -41,19 +39,19 @@ public class User {
     @NotNull
     private String password;
 
-    @NotNull
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Flat> flats;
-
-    @NotNull
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Post> posts;
-
-    @NotNull
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Reservation> reservations;
-
-    @NotNull
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Review> reviews;
+//    @NotNull
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+//    private List<Flat> flats;
+//
+//    @NotNull
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+//    private List<Post> posts;
+//
+//    @NotNull
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+//    private List<Reservation> reservations;
+//
+//    @NotNull
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+//    private List<Review> reviews;
 }

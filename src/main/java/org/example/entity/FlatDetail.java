@@ -2,33 +2,26 @@ package org.example.entity;
 
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.UUID;
 
-@Table(name = "flat_detail")
-@Getter
-@Setter
+@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class FlatDetail {
-    @NotNull
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
-    @NotNull
-    @OneToOne
-    @JoinColumn(name = "flat_id")
-    private Flat flat;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @NotNull
     private Boolean kitchen;
@@ -41,7 +34,4 @@ public class FlatDetail {
 
     @NotNull
     private Boolean wifi;
-
-
-
 }

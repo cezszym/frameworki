@@ -3,17 +3,18 @@ package org.example.entity;
 
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.UUID;
 
-@Entity
-@Table(name = "post")
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Post {
 
     @Id

@@ -16,9 +16,9 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     void deleteAllReviewsByUser(User user);
 
-    List<Review> getAllReviewsByPost(Post post);
-
     List<Review> getAllReviewsByUser(User user);
+
+    List<Review> getAllReviewsByPost(Post post);
 
     List<Review> getAllReviewsByTitle(String title);
 
