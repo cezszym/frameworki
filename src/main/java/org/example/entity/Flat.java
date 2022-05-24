@@ -7,16 +7,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.UUID;
 
-@Table(name = "flat")
-@Getter
-@Setter
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class Flat {
-    @NotNull
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -26,7 +23,7 @@ public class Flat {
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "flat_details_id")
+    @JoinColumn(name = "flatdetail_id")
     private FlatDetail flatDetail;
 
     @NotNull
