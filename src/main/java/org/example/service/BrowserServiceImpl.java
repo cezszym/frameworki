@@ -122,6 +122,7 @@ public class BrowserServiceImpl implements BrowserService {
             parser.setDefaultOperator(StandardQueryConfigHandler.Operator.OR);
             Map<String, PointsConfig> map = new HashMap<>();
             map.put("price", new PointsConfig(new DecimalFormat(), Integer.class));
+            parser.setPointsConfigMap(map);
             Query parse = parser.parse(query, "price");
             TopDocs search = acquire.search(new BooleanQuery.Builder()
                             .add(parse, BooleanClause.Occur.MUST)
@@ -135,7 +136,7 @@ public class BrowserServiceImpl implements BrowserService {
                             throw new RuntimeException(e);
                         }
                     })
-                    .map(flatDocument -> UUID.fromString(flatDocument.get("id"))).collect(Collectors.toList());
+                    .map(postDocument -> UUID.fromString(postDocument.get("id"))).collect(Collectors.toList());
             return postRepository.findAllById(ids);
         } catch (IOException | QueryNodeException e) {
             throw new RuntimeException(e);
