@@ -8,9 +8,9 @@ import org.example.model.FlatDTO;
 import org.example.model.FlatDetailDTO;
 import org.example.repository.FlatDetailRepository;
 import org.example.repository.FlatRepository;
-import org.example.repository.UserRepository;
 import org.example.request.wrappers.FlatWrapper;
 import org.example.security.Identity;
+import org.example.service.BrowserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +23,13 @@ import java.util.UUID;
 public class FlatController {
     private final FlatRepository flatRepository;
     private final FlatDetailRepository flatDetailRepository;
+    private final BrowserService browserService;
     private final Identity identity;
 
-    public FlatController(final FlatRepository flatRepository, FlatDetailRepository flatDetailRepository, Identity identity){
+    public FlatController(final FlatRepository flatRepository, FlatDetailRepository flatDetailRepository, BrowserService browserService, Identity identity){
         this.flatRepository = flatRepository;
         this.flatDetailRepository = flatDetailRepository;
+        this.browserService = browserService;
         this.identity = identity;
     }
 
@@ -126,6 +128,9 @@ public class FlatController {
                     metrage(flatDTO.getMetrage()).
                     numOfRooms(flatDTO.getNumOfRooms()).build());
 
+            // index flat
+            browserService.createFlat(flat);
+
             return new ResponseEntity<>(flat, HttpStatus.CREATED);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -143,7 +148,7 @@ public class FlatController {
         FlatDTO flatDTO = flatWrapper.getFlatDTO();
         FlatDetailDTO flatDetailDTO = flatWrapper.getFlatDetailDTO();
 
-        Flat existingFlat = this.flatRepository.getByUserAndId(user, flatDTO.getId());
+        Flat existingFlat = this.flatRepository.getByUserAndId(user, id);
         if(existingFlat == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         try{
@@ -166,6 +171,9 @@ public class FlatController {
                     country(flatDTO.getCountry()).
                     metrage(flatDTO.getMetrage()).
                     numOfRooms(flatDTO.getNumOfRooms()).build());
+
+            // update indexed flat
+            browserService.updateFlat(flat);
 
             return new ResponseEntity<>(flat, HttpStatus.OK);
         } catch(Exception e){
@@ -192,6 +200,10 @@ public class FlatController {
             this.flatRepository.delete(flat);
             // Delete flatdetails object
             this.flatDetailRepository.delete(flatDetail);
+
+            // delete indexed flat
+            browserService.deleteFlat(flat);
+
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
