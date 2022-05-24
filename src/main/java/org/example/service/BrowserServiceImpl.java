@@ -9,6 +9,10 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import org.apache.lucene.queryparser.flexible.standard.config.PointsConfig;
+import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler;
 import org.apache.lucene.search.*;
 import org.example.entity.Flat;
 import org.example.entity.Post;
@@ -17,6 +21,7 @@ import org.example.repository.PostRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -56,13 +61,17 @@ public class BrowserServiceImpl implements BrowserService {
     }
 
     @Override
-    public List<Flat> searchFlat(String query) {
+    public List<Flat> searchFlat(String query) throws QueryNodeException {
         try {
             searcherManager.maybeRefresh();
             IndexSearcher acquire = searcherManager.acquire();
-            MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{"address", "city", "country", "metrage", "rooms"}, analyzer);
-            parser.setDefaultOperator(QueryParser.Operator.OR);
-            Query parse = parser.parse(query);
+            StandardQueryParser parser = new StandardQueryParser(analyzer);
+            parser.setDefaultOperator(StandardQueryConfigHandler.Operator.OR);
+            Map<String, PointsConfig> map = new HashMap<>();
+            map.put("rooms", new PointsConfig(new DecimalFormat(), Integer.class));
+            map.put("metrage", new PointsConfig(new DecimalFormat(), Float.class));
+            parser.setPointsConfigMap(map);
+            Query parse = parser.parse(query, "city");
             TopDocs search = acquire.search(new BooleanQuery.Builder()
                             .add(parse, BooleanClause.Occur.MUST)
                             .add(new TermQuery(new Term("type", "flat")), BooleanClause.Occur.MUST)
@@ -77,7 +86,7 @@ public class BrowserServiceImpl implements BrowserService {
                     })
                     .map(flatDocument -> UUID.fromString(flatDocument.get("id"))).collect(Collectors.toList());
             return flatRepository.findAllById(ids);
-        } catch (IOException | ParseException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -109,9 +118,11 @@ public class BrowserServiceImpl implements BrowserService {
         try {
             searcherManager.maybeRefresh();
             IndexSearcher acquire = searcherManager.acquire();
-            MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{"title", "description", "price"}, analyzer);
-            parser.setDefaultOperator(QueryParser.Operator.OR);
-            Query parse = parser.parse(query);
+            StandardQueryParser parser = new StandardQueryParser(analyzer);
+            parser.setDefaultOperator(StandardQueryConfigHandler.Operator.OR);
+            Map<String, PointsConfig> map = new HashMap<>();
+            map.put("price", new PointsConfig(new DecimalFormat(), Integer.class));
+            Query parse = parser.parse(query, "price");
             TopDocs search = acquire.search(new BooleanQuery.Builder()
                             .add(parse, BooleanClause.Occur.MUST)
                             .add(new TermQuery(new Term("type", "post")), BooleanClause.Occur.MUST)
@@ -126,7 +137,7 @@ public class BrowserServiceImpl implements BrowserService {
                     })
                     .map(flatDocument -> UUID.fromString(flatDocument.get("id"))).collect(Collectors.toList());
             return postRepository.findAllById(ids);
-        } catch (IOException | ParseException e) {
+        } catch (IOException | QueryNodeException e) {
             throw new RuntimeException(e);
         }
     }

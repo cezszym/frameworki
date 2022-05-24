@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.example.entity.Flat;
 import org.example.entity.Post;
 
@@ -9,7 +10,7 @@ import java.util.List;
 public interface BrowserService {
     void createIndex();
 
-    List<Flat> searchFlat(String query);
+    List<Flat> searchFlat(String query) throws QueryNodeException;
 
     void createFlat(Flat flat) throws IOException;
 
@@ -17,7 +18,8 @@ public interface BrowserService {
 
     void deleteFlat(Flat flat) throws IOException;
 
-    List<Post> searchPost(String query);
+    // TODO: handle exception
+    List<Post> searchPost(String query) throws QueryNodeException ;
 
     void createPost(Post post) throws IOException;
 

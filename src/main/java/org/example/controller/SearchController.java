@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.example.entity.Flat;
 import org.example.entity.FlatDetail;
 import org.example.entity.Post;
@@ -35,9 +36,8 @@ public class SearchController {
         try {
             List<Flat> flats = browserService.searchFlat(query);
             return new ResponseEntity<>(flats.stream().map(FlatDTO::fromEntity).collect(Collectors.toList()), HttpStatus.OK);
-        } catch(Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch(QueryNodeException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -49,9 +49,8 @@ public class SearchController {
         try {
             List<Post> posts = browserService.searchPost(query);
             return new ResponseEntity<>(posts.stream().map(PostDTO::fromEntity).collect(Collectors.toList()), HttpStatus.OK);
-        } catch(Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch(QueryNodeException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
