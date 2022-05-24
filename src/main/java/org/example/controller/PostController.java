@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.example.entity.Flat;
 import org.example.entity.Post;
 import org.example.entity.User;
@@ -30,6 +31,7 @@ public class PostController {
         this.identity = identity;
     }
 
+    @Operation(summary = "Get all posts")
     @GetMapping("/")
     public ResponseEntity<?> getAll() {
         try {
@@ -41,6 +43,7 @@ public class PostController {
         }
     }
 
+    @Operation(summary = "Get post by id")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") UUID id) {
         try {
@@ -57,6 +60,7 @@ public class PostController {
         }
     }
 
+    @Operation(summary = "Get posts for authenticated user")
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUserPosts(@PathVariable("id") UUID id) {
         // Authorize user
@@ -72,6 +76,7 @@ public class PostController {
         }
     }
 
+    @Operation(summary = "Create post by flat id")
     @PostMapping("/{flatId}")
     public ResponseEntity<?> save(@PathVariable("flatId") UUID id, @RequestBody PostDTO postDTO) {
         // Authorize user
@@ -79,6 +84,7 @@ public class PostController {
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         Flat flat = this.flatRepository.getByUserAndId(user, id);
+        if(flat == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         try{
             Post post = postRepository.save(Post.builder().flat(flat)
@@ -97,13 +103,15 @@ public class PostController {
         }
     }
 
+    @Operation(summary = "Update post by id")
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePost(@PathVariable("id") UUID id, @RequestBody PostDTO postDTO) {
         // Authorize user
         User user = this.identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        Flat flat = this.flatRepository.getByUserAndId(user, id);
+        Flat flat = this.postRepository.getByUserAndId(user, id).getFlat();
+        if(flat == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         try{
             delete(id);
@@ -124,6 +132,7 @@ public class PostController {
         }
     }
 
+    @Operation(summary = "Delete post by id")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
         // Authorize user

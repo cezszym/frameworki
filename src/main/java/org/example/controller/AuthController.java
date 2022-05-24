@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.example.dto.JWTAuthResponse;
 import org.example.dto.LoginDto;
 import org.example.dto.SignUpDto;
@@ -15,10 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -39,6 +37,7 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider tokenProvider;
 
+    @Operation(summary = "Signup user to EasyHotel")
     @PostMapping("/signin")
     public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto){
         try {
@@ -47,19 +46,26 @@ public class AuthController {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            // get token form tokenProvider
             String token = tokenProvider.generateToken(authentication);
             return ResponseEntity.ok(new JWTAuthResponse(token));
-        } catch (AuthenticationException e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (AuthenticationException e){
+
         }
+
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+
     }
 
+    @Operation(summary = "Signin user to EasyHotel")
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpDto signUpDto){
+
 
         if(userRepository.existsByNick(signUpDto.getNick())){
             return new ResponseEntity<>("Username is already taken!", HttpStatus.BAD_REQUEST);
         }
+
 
         if(userRepository.existsByEmail(signUpDto.getEmail())){
             return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
@@ -73,9 +79,11 @@ public class AuthController {
         user.setPhoneNumber(signUpDto.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
 
+
         userRepository.save(user);
 
         return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
+
     }
 }
 

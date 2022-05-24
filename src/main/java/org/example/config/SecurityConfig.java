@@ -1,5 +1,7 @@
 package org.example.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.example.security.CustomUserDetailsService;
 import org.example.security.JwtAuthenticationEntryPoint;
 import org.example.security.JwtAuthenticationFilter;
@@ -12,6 +14,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -27,7 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
-    PasswordEncoder passwordEncoder(){
+    public static PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
@@ -49,6 +52,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/console/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/v3/api-docs/**").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/webjars/**").permitAll()
                 .anyRequest()
                 .authenticated();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
