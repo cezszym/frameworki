@@ -78,6 +78,16 @@
       <artifactId>springdoc-openapi-security</artifactId>
       <version>1.6.8</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>9.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-queryparser</artifactId>
+      <version>9.1.0</version>
+    </dependency>
 
 
   </dependencies>

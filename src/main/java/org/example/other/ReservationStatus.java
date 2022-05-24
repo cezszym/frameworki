@@ -1,5 +1,5 @@
 package org.example.other;
 
 public enum ReservationStatus {
-    created,confirmed,cancelled,completed,
+    CREATED, CONFIRMED, CANCELLED, COMPLETED,
 }

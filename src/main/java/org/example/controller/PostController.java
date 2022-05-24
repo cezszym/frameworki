@@ -8,6 +8,7 @@ import org.example.model.PostDTO;
 import org.example.repository.FlatRepository;
 import org.example.repository.PostRepository;
 import org.example.security.Identity;
+import org.example.service.BrowserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,11 +24,13 @@ public class PostController {
 
     private final PostRepository postRepository;
     private final FlatRepository flatRepository;
+    private final BrowserService browserService;
     private final Identity identity;
 
-    public PostController(PostRepository postRepository, FlatRepository flatRepository, Identity identity) {
+    public PostController(PostRepository postRepository, FlatRepository flatRepository, BrowserService browserService, Identity identity) {
         this.postRepository = postRepository;
         this.flatRepository = flatRepository;
+        this.browserService = browserService;
         this.identity = identity;
     }
 
@@ -97,6 +100,9 @@ public class PostController {
                     .expired(postDTO.getExpired())
                     .build());
 
+            // index post
+            browserService.createPost(post);
+
             return new ResponseEntity<>(post, HttpStatus.CREATED);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -126,6 +132,9 @@ public class PostController {
                     .expired(postDTO.getExpired())
                     .build());
 
+            // update post index
+            browserService.updatePost(post);
+
             return new ResponseEntity<>(post, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -145,6 +154,10 @@ public class PostController {
 
         try{
             this.postRepository.delete(post);
+
+            // delete post index
+            browserService.deletePost(post);
+
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
