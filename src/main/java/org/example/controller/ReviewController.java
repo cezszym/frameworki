@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.example.entity.Post;
 import org.example.entity.Review;
 import org.example.entity.User;
@@ -32,6 +33,7 @@ public class ReviewController {
         this.identity = identity;
     }
 
+    @Operation(summary = "Get all reviews for authenticated user")
     @GetMapping("/")
     public ResponseEntity<List<Review>> getAllByUser(){
 
@@ -49,6 +51,7 @@ public class ReviewController {
         }
     }
 
+    @Operation(summary = "Get all reviews by post id in descending order of likes")
     @GetMapping("/post/likes/{postId}")
     public ResponseEntity<List<Review>> findAllReviewsByPostOrderByLikesDesc(@PathVariable("postId") UUID postId){
 
@@ -67,6 +70,7 @@ public class ReviewController {
     }
 
 
+    @Operation(summary = "Get all reviews by post id in descending order of dislikes")
     @GetMapping("/post/dislikes/{postId}")
     public ResponseEntity<List<Review>> findAllReviewsByPostOrderByDislikesDesc(@PathVariable("postId") UUID postId){
 
@@ -85,6 +89,7 @@ public class ReviewController {
     }
 
 
+    @Operation(summary = "Get review by id")
     @GetMapping("/{reviewId}")
     public ResponseEntity<Review> getById(@PathVariable("reviewId") UUID reviewId){
         try{
@@ -101,6 +106,7 @@ public class ReviewController {
         }
     }
 
+    @Operation(summary = "Create review")
     @PostMapping("/{postId}")
     public ResponseEntity<?> save(@PathVariable("postId") UUID id, @RequestBody ReviewDTO reviewDTO){
 
@@ -126,6 +132,7 @@ public class ReviewController {
         }
     }
 
+    @Operation(summary = "Update review by id")
     @PutMapping("/{reviewId}")
     public ResponseEntity<?> update(@PathVariable("reviewId") UUID reviewId, @RequestBody ReviewDTO reviewDTO){
         // Authorize user
@@ -156,6 +163,7 @@ public class ReviewController {
         }
     }
 
+    @Operation(summary = "Delete review by id")
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<?> deleteById(@PathVariable("reviewId") UUID reviewId){
         // Authorize user
@@ -173,6 +181,7 @@ public class ReviewController {
         }
     }
 
+    @Operation(summary = "Delete all reviews")
     @DeleteMapping("/")
     public ResponseEntity<?> deleteAll(){
         // Authorize user

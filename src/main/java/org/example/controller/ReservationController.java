@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.example.entity.Post;
 import org.example.entity.Reservation;
 import org.example.entity.User;
@@ -32,6 +33,7 @@ public class ReservationController {
         this.identity = identity;
     }
 
+    @Operation(summary = "Get all reservations")
     @GetMapping("/")
     public ResponseEntity<List<Reservation>> getAll(){
         // Authorize user
@@ -49,6 +51,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Get reservation by id")
     @GetMapping("/{reservationId}")
     public ResponseEntity<Reservation> getById(@PathVariable("reservationId") UUID reservationId){
         // Authorize user
@@ -64,6 +67,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Get all reservations by status")
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Reservation>> getAllByStatus(@PathVariable("status") ReservationStatus status){
         // Authorize user
@@ -81,6 +85,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Create reservation")
     @PostMapping("/{postId}")
     public ResponseEntity<?> save(@PathVariable("postId") UUID postId, @RequestBody ReservationDTO reservationDTO){
 
@@ -105,6 +110,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Update reservation by id")
     @PutMapping("/{reservationId}")
     public ResponseEntity<?> update(@PathVariable("reservationId") UUID reservationId, @RequestBody ReservationDTO reservationDTO){
 
@@ -133,6 +139,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Delete reservation by id")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<?> deleteById(@PathVariable("reservationId") UUID reservationId){
         // Authorize user
@@ -150,6 +157,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Delete all reservations")
     @DeleteMapping("/")
     public ResponseEntity<?> deleteAll(){
         // Authorize user
@@ -169,6 +177,7 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Delete reservation by status")
     @DeleteMapping("/status/{status}")
     public ResponseEntity<?> deleteByStatus(@PathVariable("status") ReservationStatus status){
         // Authorize user
