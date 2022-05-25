@@ -9,6 +9,9 @@ import org.example.repository.FlatRepository;
 import org.example.repository.PostRepository;
 import org.example.security.Identity;
 import org.example.service.BrowserService;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Controller
 @RequestMapping("/api/post")
@@ -36,11 +41,19 @@ public class PostController {
 
     @Operation(summary = "Get all posts")
     @GetMapping("/")
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<CollectionModel<Post>> getAll() {
+
+        Link link = linkTo(PostController.class).withSelfRel();
+
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
         try {
             List<Post> posts = new ArrayList<>(this.postRepository.findAll());
             if(posts.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-            return new ResponseEntity<>(posts, HttpStatus.OK);
+            posts.forEach(post -> post.add(linkTo(PostController.class).slash(post.getId()).withSelfRel()));
+            return ResponseEntity.ok(CollectionModel.of(posts,link));
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -48,16 +61,18 @@ public class PostController {
 
     @Operation(summary = "Get post by id")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable("id") UUID id) {
-        try {
-            // Authorize user
-            User user = identity.getCurrent();
-            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<EntityModel<Post>> getById(@PathVariable("id") UUID id) {
 
+        Link link = linkTo(PostController.class).slash(id).withSelfRel();
+
+        // Authorize user
+        User user = identity.getCurrent();
+        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        try {
             Post post = this.postRepository.getByUserAndId(user, id);
             if(post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-
-            return new ResponseEntity<>(post, HttpStatus.OK);
+            return ResponseEntity.ok(EntityModel.of(post,link));
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -65,15 +80,20 @@ public class PostController {
 
     @Operation(summary = "Get posts for authenticated user")
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUserPosts(@PathVariable("id") UUID id) {
+    public ResponseEntity<CollectionModel<Post>> getUserPosts(@PathVariable("id") UUID id) {
+
+        Link link = linkTo(PostController.class).slash("user").slash(id).withSelfRel();
+
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         try {
             List<Post> posts = new ArrayList<>(this.postRepository.getAllByUser(user));
+            posts.forEach(post -> post.add(linkTo(PostController.class).slash(post.getId()).withSelfRel()));
+
             if(posts.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-            return new ResponseEntity<>(posts, HttpStatus.OK);
+            return ResponseEntity.ok(CollectionModel.of(posts,link));
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -81,7 +101,7 @@ public class PostController {
 
     @Operation(summary = "Create post by flat id")
     @PostMapping("/{flatId}")
-    public ResponseEntity<?> save(@PathVariable("flatId") UUID id, @RequestBody PostDTO postDTO) {
+    public ResponseEntity<EntityModel<Post>> save(@PathVariable("flatId") UUID id, @RequestBody PostDTO postDTO) {
         // Authorize user
         User user = this.identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -103,7 +123,8 @@ public class PostController {
             // index post
             browserService.createPost(post);
 
-            return new ResponseEntity<>(post, HttpStatus.CREATED);
+            Link link = linkTo(PostRepository.class).slash(post.getId()).withSelfRel();
+            return ResponseEntity.ok(EntityModel.of(post, link));
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -111,7 +132,9 @@ public class PostController {
 
     @Operation(summary = "Update post by id")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePost(@PathVariable("id") UUID id, @RequestBody PostDTO postDTO) {
+    public ResponseEntity<EntityModel<?>> updatePost(@PathVariable("id") UUID id, @RequestBody PostDTO postDTO) {
+        Link link = linkTo(ReservationController.class).slash(id).withSelfRel();
+
         // Authorize user
         User user = this.identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -119,23 +142,25 @@ public class PostController {
         Flat flat = this.postRepository.getByUserAndId(user, id).getFlat();
         if(flat == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
-        try{
-            delete(id);
+        Post post = this.postRepository.getByUserAndId(user, id);
+        if (post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
-            Post post = postRepository.save(Post.builder().flat(flat)
-                    .user(user)
-                    .title(postDTO.getTitle())
-                    .description(postDTO.getDescription())
-                    .price(postDTO.getPrice())
-                    .promoted(postDTO.isPromoted())
-                    .created(postDTO.getCreated())
-                    .expired(postDTO.getExpired())
-                    .build());
+        try{
+            post.setFlat(flat);
+            post.setUser(user);
+            post.setTitle(postDTO.getTitle());
+            post.setDescription(postDTO.getDescription());
+            post.setPrice(postDTO.getPrice());
+            post.setPromoted(postDTO.isPromoted());
+            post.setCreated(postDTO.getCreated());
+            post.setExpired(postDTO.getExpired());
+
+            this.postRepository.save(post);
 
             // update post index
             browserService.updatePost(post);
 
-            return new ResponseEntity<>(post, HttpStatus.OK);
+            return ResponseEntity.ok(EntityModel.of(post, link));
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

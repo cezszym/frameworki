@@ -10,6 +10,9 @@ import org.example.repository.PostRepository;
 import org.example.repository.ReservationRepository;
 import org.example.repository.UserRepository;
 import org.example.security.Identity;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RequestMapping("/api/reservations")
 @RestController
@@ -35,7 +40,9 @@ public class ReservationController {
 
     @Operation(summary = "Get all reservations")
     @GetMapping("/")
-    public ResponseEntity<List<Reservation>> getAll(){
+    public ResponseEntity<CollectionModel<Reservation>> getAll(){
+        Link link = linkTo(ReservationController.class).withSelfRel();
+
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -43,9 +50,10 @@ public class ReservationController {
         try {
             // first, take current user's ID, then get user from database and put into getAllReservationsByUser
             ArrayList<Reservation> reservations = new ArrayList<>(this.reservationRepository.getAllByUser(this.userRepository.getById(this.identity.getCurrent().getId())));
+            reservations.forEach(reservation -> reservation.add(linkTo(ReservationController.class).slash(reservation.getId()).withSelfRel()));
 
             if (reservations.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-            return new ResponseEntity<>(reservations, HttpStatus.OK);
+            return ResponseEntity.ok(CollectionModel.of(reservations,link));
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -53,15 +61,18 @@ public class ReservationController {
 
     @Operation(summary = "Get reservation by id")
     @GetMapping("/{reservationId}")
-    public ResponseEntity<Reservation> getById(@PathVariable("reservationId") UUID reservationId){
+    public ResponseEntity<EntityModel<Reservation>> getById(@PathVariable("reservationId") UUID reservationId){
+        Link link = linkTo(ReservationController.class).slash(reservationId).withSelfRel();
+
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         try{
             Reservation reservation = this.reservationRepository.getByUserAndId(user, reservationId);
+
             if(reservation == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>(reservation, HttpStatus.OK);
+            return ResponseEntity.ok(EntityModel.of(reservation,link));
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -69,15 +80,21 @@ public class ReservationController {
 
     @Operation(summary = "Get all reservations by status")
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Reservation>> getAllByStatus(@PathVariable("status") ReservationStatus status){
+    public ResponseEntity<CollectionModel<Reservation>> getAllByStatus(@PathVariable("status") ReservationStatus status){
+        Link link = linkTo(ReservationController.class).slash("status").slash(status).withSelfRel();
+
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         try {
             ArrayList<Reservation> reservations = new ArrayList<>(this.reservationRepository.getAllByUserAndStatus(user, status));
+
             if(reservations.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-            return new ResponseEntity<>(reservations, HttpStatus.OK);
+            reservations.forEach(reservation -> reservation.add(linkTo(ReservationController.class).slash(reservation.getId()).withSelfRel()));
+            return ResponseEntity.ok(CollectionModel.of(reservations,link));
+
+            //return new ResponseEntity<>(reservations, HttpStatus.OK);
         } catch(IllegalArgumentException e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Exception e){
@@ -87,7 +104,7 @@ public class ReservationController {
 
     @Operation(summary = "Create reservation")
     @PostMapping("/{postId}")
-    public ResponseEntity<?> save(@PathVariable("postId") UUID postId, @RequestBody ReservationDTO reservationDTO){
+    public ResponseEntity<EntityModel<?>> save(@PathVariable("postId") UUID postId, @RequestBody ReservationDTO reservationDTO){
 
         // Authorize user
         User user = identity.getCurrent();
@@ -104,7 +121,8 @@ public class ReservationController {
                     status(reservationDTO.getStatus()).
                     created(reservationDTO.getCreated()).build());
 
-            return new ResponseEntity<>(reservation, HttpStatus.CREATED);
+            Link link = linkTo(ReservationController.class).slash(reservation.getId()).withSelfRel();
+            return ResponseEntity.ok(EntityModel.of(reservation, link));
         } catch(Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -112,29 +130,31 @@ public class ReservationController {
 
     @Operation(summary = "Update reservation by id")
     @PutMapping("/{reservationId}")
-    public ResponseEntity<?> update(@PathVariable("reservationId") UUID reservationId, @RequestBody ReservationDTO reservationDTO){
+    public ResponseEntity<EntityModel<?>> update(@PathVariable("reservationId") UUID reservationId, @RequestBody ReservationDTO reservationDTO){
+        Link link = linkTo(ReservationController.class).slash(reservationId).withSelfRel();
 
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         Reservation currentReservation = this.reservationRepository.getByUserAndId(user, reservationId);
-        if(currentReservation == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        if (currentReservation == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
-        Post post = currentReservation.getPost();
+        try {
+            currentReservation.setPost(currentReservation.getPost());
+            currentReservation.setUser(user);
 
-        try{
-            deleteById(reservationId);
 
-            Reservation reservation = this.reservationRepository.save(Reservation.builder().
-                    post(post).user(user).
-                    start(reservationDTO.getStart()).
-                    end(reservationDTO.getEnd()).
-                    status(reservationDTO.getStatus()).
-                    created(reservationDTO.getCreated()).build());
+            currentReservation.setStart(reservationDTO.getStart());
+            currentReservation.setEnd(reservationDTO.getEnd());
 
-            return new ResponseEntity<>(reservation, HttpStatus.CREATED);
-        } catch (Exception e){
+            currentReservation.setStatus(reservationDTO.getStatus());
+            currentReservation.setCreated(reservationDTO.getCreated());
+
+            this.reservationRepository.save(currentReservation);
+
+            return ResponseEntity.ok(EntityModel.of(currentReservation, link));
+        }catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

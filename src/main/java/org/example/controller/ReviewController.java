@@ -1,9 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.apache.catalina.valves.rewrite.RewriteCond;
 import org.example.entity.Post;
-import org.example.entity.Reservation;
 import org.example.entity.Review;
 import org.example.entity.User;
 import org.example.model.ReviewDTO;
@@ -11,6 +9,9 @@ import org.example.repository.PostRepository;
 import org.example.repository.ReviewRepository;
 import org.example.repository.UserRepository;
 import org.example.security.Identity;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 
 @RestController
@@ -37,7 +40,9 @@ public class ReviewController {
 
     @Operation(summary = "Get all reviews for authenticated user")
     @GetMapping("/")
-    public ResponseEntity<List<Review>> getAllByUser(){
+    public ResponseEntity<CollectionModel<Review>> getAllByUser(){
+
+        Link link = linkTo(ReviewController.class).withSelfRel();
 
         try {
             // Authorize user
@@ -46,8 +51,10 @@ public class ReviewController {
 
             ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.getAllByUser(user));
 
+            reviews.forEach(review -> review.add(linkTo(ReviewController.class).slash(review.getId()).withSelfRel()));
+
             if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            return new ResponseEntity<>(reviews, HttpStatus.OK);
+            return ResponseEntity.ok(CollectionModel.of(reviews,link));
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -55,7 +62,7 @@ public class ReviewController {
 
     @Operation(summary = "Get all reviews by post id in descending order of likes")
     @GetMapping("/post/likes/{postId}")
-    public ResponseEntity<Review> findAllReviewsByPostOrderByLikesDesc(@PathVariable("postId") UUID postId){
+    public ResponseEntity<EntityModel<Review>> findAllReviewsByPostOrderByLikesDesc(@PathVariable("postId") UUID postId){
 
         try {
             // Authorize user
@@ -68,7 +75,9 @@ public class ReviewController {
             ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByLikesDesc(post));
             if (reviews.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
-            return new ResponseEntity<>(reviews.get(0), HttpStatus.OK);
+            Link link = linkTo(ReviewController.class).slash("post/likes").slash(reviews.get(0).getId()).withSelfRel();
+
+            return ResponseEntity.ok(EntityModel.of(reviews.get(0),link));
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -76,7 +85,7 @@ public class ReviewController {
 
     @Operation(summary = "Get all reviews by post id in descending order of dislikes")
     @GetMapping("/post/dislikes/{postId}")
-    public ResponseEntity<Review> findAllReviewsByPostOrderByDislikesDesc(@PathVariable("postId") UUID postId){
+    public ResponseEntity<EntityModel<Review>> findAllReviewsByPostOrderByDislikesDesc(@PathVariable("postId") UUID postId){
 
         try {
             // Authorize user
@@ -89,7 +98,9 @@ public class ReviewController {
             ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByDislikesDesc(post));
             if (reviews.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
-            return new ResponseEntity<>(reviews.get(0), HttpStatus.OK);
+            Link link = linkTo(ReviewController.class).slash("post").slash("dislikes").slash(reviews.get(0).getId()).withSelfRel();
+
+            return ResponseEntity.ok(EntityModel.of(reviews.get(0),link));
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -97,6 +108,7 @@ public class ReviewController {
 
     @GetMapping("/like/{reviewId}")
     public ResponseEntity<?> like(@PathVariable("reviewId") UUID id){
+
         try {
             // Authorize user
             User user = identity.getCurrent();
@@ -115,6 +127,7 @@ public class ReviewController {
 
     @GetMapping("/dislike/{reviewId}")
     public ResponseEntity<?> dislike(@PathVariable("reviewId") UUID id){
+
         try {
             // Authorize user
             User user = identity.getCurrent();
@@ -133,7 +146,10 @@ public class ReviewController {
 
     @Operation(summary = "Get review by id")
     @GetMapping("/{reviewId}")
-    public ResponseEntity<Review> getById(@PathVariable("reviewId") UUID reviewId){
+    public ResponseEntity<EntityModel<Review>> getById(@PathVariable("reviewId") UUID reviewId){
+
+        Link link = linkTo(ReviewController.class).slash(reviewId).withSelfRel();
+
         try{
             // Authorize user
             User user = identity.getCurrent();
@@ -142,7 +158,8 @@ public class ReviewController {
             Review review = this.reviewRepository.getByUserAndId(user, reviewId);
             if(review == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
-            return new ResponseEntity<>(review, HttpStatus.OK);
+            review.add(link);
+            return ResponseEntity.ok(EntityModel.of(review, link));
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -150,7 +167,7 @@ public class ReviewController {
 
     @Operation(summary = "Create review")
     @PostMapping("/{postId}")
-    public ResponseEntity<?> save(@PathVariable("postId") UUID id, @RequestBody ReviewDTO reviewDTO){
+    public ResponseEntity<EntityModel<?>> save(@PathVariable("postId") UUID id, @RequestBody ReviewDTO reviewDTO){
 
         // Authorize user
         User user = identity.getCurrent();
@@ -168,7 +185,8 @@ public class ReviewController {
                     likes(reviewDTO.getLikes()).
                     dislikes(reviewDTO.getDislikes()).build());
 
-            return new ResponseEntity<>(review, HttpStatus.CREATED);
+            Link link = linkTo(ReviewController.class).slash(review.getId()).withSelfRel();
+            return ResponseEntity.ok(EntityModel.of(review, link));
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -176,34 +194,31 @@ public class ReviewController {
 
     @Operation(summary = "Update review by id")
     @PutMapping("/{reviewId}")
-    public ResponseEntity<?> update(@PathVariable("reviewId") UUID reviewId, @RequestBody ReviewDTO reviewDTO){
-        // Authorize user
-        User user = identity.getCurrent();
-        if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<EntityModel<?>> update(@PathVariable("reviewId") UUID reviewId, @RequestBody ReviewDTO reviewDTO){
+        try {
+            Link link = linkTo(ReviewController.class).slash(reviewId).withSelfRel();
 
-        Review currentReview = this.reviewRepository.getByUserAndId(user, reviewId);
-        if(currentReview == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            // Authorize user
+            User user = identity.getCurrent();
+            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        Integer currentReviewLikes = currentReview.getLikes();
-        Integer currentReviewDislikes = currentReview.getDislikes();
+            Review currentReview = this.reviewRepository.getByUserAndId(user, reviewId);
+            if (currentReview == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
-        Post post = currentReview.getPost();
+            currentReview.setPost(currentReview.getPost());
+            currentReview.setUser(user);
 
-        try{
-            // Delete existing review
-            deleteById(reviewId);
+            currentReview.setTitle(reviewDTO.getTitle());
+            currentReview.setContents(reviewDTO.getContents());
+            currentReview.setExposureDate(reviewDTO.getExposureDate());
 
-            // Add new ones
-            Review review = this.reviewRepository.save(Review.builder().
-                    post(post).user(user).
-                    title(reviewDTO.getTitle()).
-                    contents(reviewDTO.getContents()).
-                    exposureDate(reviewDTO.getExposureDate()).
-                    likes(currentReviewLikes).
-                    dislikes(currentReviewDislikes).build());
+            currentReview.setLikes(reviewDTO.getLikes());
+            currentReview.setDislikes(reviewDTO.getDislikes());
 
-            return new ResponseEntity<>(review,HttpStatus.CREATED);
-        } catch (Exception e){
+            this.reviewRepository.save(currentReview);
+
+            return ResponseEntity.ok(EntityModel.of(currentReview, link));
+        }catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

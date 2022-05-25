@@ -3,6 +3,7 @@ package org.example.entity;
 
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -12,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Flat {
+public class Flat extends RepresentationModel<Flat> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
