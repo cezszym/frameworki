@@ -23,3 +23,8 @@ Internet service for renting apartments from private persons. An authorized user
 <p align="center">
   <img width="460" height="300" src="https://user-images.githubusercontent.com/64095970/170123843-683c7ed8-48f5-4438-89af-2480ed0a608b.png">
 </p>
+
+### Reservations
+<p align="center">
+  <img width="460" height="300" src="https://user-images.githubusercontent.com/64095970/170205766-45c5f81b-848f-42bf-8531-eacbfa906152.png">
+</p>
