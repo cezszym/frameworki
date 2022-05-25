@@ -1,7 +1,9 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import org.apache.catalina.valves.rewrite.RewriteCond;
 import org.example.entity.Post;
+import org.example.entity.Reservation;
 import org.example.entity.Review;
 import org.example.entity.User;
 import org.example.model.ReviewDTO;
@@ -42,7 +44,7 @@ public class ReviewController {
             User user = identity.getCurrent();
             if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.getAllReviewsByUser(user));
+            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.getAllByUser(user));
 
             if (reviews.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             return new ResponseEntity<>(reviews, HttpStatus.OK);
@@ -53,41 +55,81 @@ public class ReviewController {
 
     @Operation(summary = "Get all reviews by post id in descending order of likes")
     @GetMapping("/post/likes/{postId}")
-    public ResponseEntity<List<Review>> findAllReviewsByPostOrderByLikesDesc(@PathVariable("postId") UUID postId){
+    public ResponseEntity<Review> findAllReviewsByPostOrderByLikesDesc(@PathVariable("postId") UUID postId){
 
         try {
             // Authorize user
             User user = identity.getCurrent();
             if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByLikesDesc(postId));
+            Post post = this.postRepository.getByUserAndId(user, postId);
+            if(post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByLikesDesc(post));
             if (reviews.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
-            return new ResponseEntity<>(reviews, HttpStatus.OK);
+            return new ResponseEntity<>(reviews.get(0), HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @Operation(summary = "Get all reviews by post id in descending order of dislikes")
     @GetMapping("/post/dislikes/{postId}")
-    public ResponseEntity<List<Review>> findAllReviewsByPostOrderByDislikesDesc(@PathVariable("postId") UUID postId){
+    public ResponseEntity<Review> findAllReviewsByPostOrderByDislikesDesc(@PathVariable("postId") UUID postId){
 
         try {
             // Authorize user
             User user = identity.getCurrent();
             if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByDislikesDesc(postId));
+            Post post = this.postRepository.getByUserAndId(user, postId);
+            if(post == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+            ArrayList<Review> reviews = new ArrayList<>(this.reviewRepository.findAllReviewsByPostOrderByDislikesDesc(post));
             if (reviews.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
-            return new ResponseEntity<>(reviews, HttpStatus.OK);
+            return new ResponseEntity<>(reviews.get(0), HttpStatus.OK);
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @GetMapping("/like/{reviewId}")
+    public ResponseEntity<?> like(@PathVariable("reviewId") UUID id){
+        try {
+            // Authorize user
+            User user = identity.getCurrent();
+            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+            Review review = this.reviewRepository.getByUserAndId(user, id);
+            if(review == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+            review.setLikes(review.getLikes()+1);
+
+            return update(id, ReviewDTO.fromEntity(review));
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/dislike/{reviewId}")
+    public ResponseEntity<?> dislike(@PathVariable("reviewId") UUID id){
+        try {
+            // Authorize user
+            User user = identity.getCurrent();
+            if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+            Review review = this.reviewRepository.getByUserAndId(user, id);
+            if(review == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+            review.setDislikes(review.getDislikes()+1);
+
+            return update(id, ReviewDTO.fromEntity(review));
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @Operation(summary = "Get review by id")
     @GetMapping("/{reviewId}")
@@ -97,7 +139,7 @@ public class ReviewController {
             User user = identity.getCurrent();
             if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-            Review review = this.reviewRepository.getReviewByUserAndId(user, reviewId);
+            Review review = this.reviewRepository.getByUserAndId(user, reviewId);
             if(review == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
             return new ResponseEntity<>(review, HttpStatus.OK);
@@ -139,8 +181,11 @@ public class ReviewController {
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        Review currentReview = this.reviewRepository.getReviewByUserAndId(user, reviewId);
+        Review currentReview = this.reviewRepository.getByUserAndId(user, reviewId);
         if(currentReview == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+        Integer currentReviewLikes = currentReview.getLikes();
+        Integer currentReviewDislikes = currentReview.getDislikes();
 
         Post post = currentReview.getPost();
 
@@ -154,8 +199,8 @@ public class ReviewController {
                     title(reviewDTO.getTitle()).
                     contents(reviewDTO.getContents()).
                     exposureDate(reviewDTO.getExposureDate()).
-                    likes(reviewDTO.getLikes()).
-                    dislikes(reviewDTO.getDislikes()).build());
+                    likes(currentReviewLikes).
+                    dislikes(currentReviewDislikes).build());
 
             return new ResponseEntity<>(review,HttpStatus.CREATED);
         } catch (Exception e){
@@ -171,7 +216,7 @@ public class ReviewController {
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         try{
-            Review review = this.reviewRepository.getReviewByUserAndId(user, reviewId);
+            Review review = this.reviewRepository.getByUserAndId(user, reviewId);
             if(review == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
             this.reviewRepository.deleteById(reviewId);
@@ -189,7 +234,12 @@ public class ReviewController {
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         try{
-            this.reviewRepository.deleteAllReviewsByUser(this.userRepository.getById(this.identity.getCurrent().getId()));
+            List<Review> reviews = this.reviewRepository.getAllByUser(user);
+            if(reviews.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+
+            for(Review review : reviews)
+                this.reviewRepository.delete(review);
+
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

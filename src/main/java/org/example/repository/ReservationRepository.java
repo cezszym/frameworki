@@ -15,5 +15,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
     Reservation getByUserAndId(User user, UUID reservationId);
     List<Reservation> getAllByUserAndStatus(User user, ReservationStatus reservationStatus);
     void deleteById(UUID reservationId);
-    void deleteAllReservationsByUser(User user);
 }

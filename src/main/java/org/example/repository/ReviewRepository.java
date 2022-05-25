@@ -12,9 +12,8 @@ import java.util.UUID;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
     void deleteById(UUID reservationId);
-    void deleteAllReviewsByUser(User user);
-    List<Review> getAllReviewsByUser(User user);
-    Review getReviewByUserAndId(User user, UUID reviewId);
-    List<Review> findAllReviewsByPostOrderByLikesDesc(UUID postId);
-    List<Review> findAllReviewsByPostOrderByDislikesDesc(UUID postId);
+    List<Review> getAllByUser(User user);
+    Review getByUserAndId(User user, UUID reviewId);
+    List<Review> findAllReviewsByPostOrderByLikesDesc(Post post);
+    List<Review> findAllReviewsByPostOrderByDislikesDesc(Post post);
 }

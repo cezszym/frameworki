@@ -157,15 +157,15 @@ public class ReservationController {
         }
     }
 
-    @Operation(summary = "Delete all reservations")
-    @DeleteMapping("/")
-    public ResponseEntity<?> deleteAll(){
+    @Operation(summary = "Delete reservation by status")
+    @DeleteMapping("/status/{status}")
+    public ResponseEntity<?> deleteByStatus(@PathVariable("status") ReservationStatus status){
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         try{
-            List<Reservation> reservations = this.reservationRepository.getAllByUser(user);
+            List<Reservation> reservations = this.reservationRepository.getAllByUserAndStatus(user, status);
             if(reservations.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
             for(Reservation reservation : reservations)
@@ -177,15 +177,15 @@ public class ReservationController {
         }
     }
 
-    @Operation(summary = "Delete reservation by status")
-    @DeleteMapping("/status/{status}")
-    public ResponseEntity<?> deleteByStatus(@PathVariable("status") ReservationStatus status){
+    @Operation(summary = "Delete all reservations")
+    @DeleteMapping("/")
+    public ResponseEntity<?> deleteAll(){
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         try{
-            List<Reservation> reservations = this.reservationRepository.getAllByUserAndStatus(user, status);
+            List<Reservation> reservations = this.reservationRepository.getAllByUser(user);
             if(reservations.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 
             for(Reservation reservation : reservations)
