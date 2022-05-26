@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.example.entity.Flat;
 import org.example.entity.Post;
 import org.example.entity.User;
@@ -61,7 +62,11 @@ public class PostController {
 
     @Operation(summary = "Get post by id")
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<Post>> getById(@PathVariable("id") UUID id) {
+    public ResponseEntity<EntityModel<Post>> getById(
+            @Parameter(
+                    description = "unique id of post",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("id") UUID id) {
 
         Link link = linkTo(PostController.class).slash(id).withSelfRel();
 
@@ -80,7 +85,8 @@ public class PostController {
 
     @Operation(summary = "Get posts for authenticated user")
     @GetMapping("/user/{id}")
-    public ResponseEntity<CollectionModel<Post>> getUserPosts(@PathVariable("id") UUID id) {
+    public ResponseEntity<CollectionModel<Post>> getUserPosts(
+            @PathVariable("id") UUID id) {
 
         Link link = linkTo(PostController.class).slash("user").slash(id).withSelfRel();
 
@@ -101,7 +107,11 @@ public class PostController {
 
     @Operation(summary = "Create post by flat id")
     @PostMapping("/{flatId}")
-    public ResponseEntity<EntityModel<Post>> save(@PathVariable("flatId") UUID id, @RequestBody PostDTO postDTO) {
+    public ResponseEntity<EntityModel<Post>> save(
+            @Parameter(
+                    description = "unique id of flat",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("flatId") UUID id, @RequestBody PostDTO postDTO) {
         // Authorize user
         User user = this.identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -132,7 +142,11 @@ public class PostController {
 
     @Operation(summary = "Update post by id")
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<?>> updatePost(@PathVariable("id") UUID id, @RequestBody PostDTO postDTO) {
+    public ResponseEntity<EntityModel<?>> updatePost(
+            @Parameter(
+                    description = "unique id of post",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("id") UUID id, @RequestBody PostDTO postDTO) {
         Link link = linkTo(ReservationController.class).slash(id).withSelfRel();
 
         // Authorize user
@@ -168,7 +182,11 @@ public class PostController {
 
     @Operation(summary = "Delete post by id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
+    public ResponseEntity<?> delete(
+            @Parameter(
+                    description = "unique id of post",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("id") UUID id) {
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);

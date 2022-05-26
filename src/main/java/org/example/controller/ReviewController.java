@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.example.entity.Post;
 import org.example.entity.Review;
 import org.example.entity.User;
@@ -62,7 +63,11 @@ public class ReviewController {
 
     @Operation(summary = "Get all reviews by post id in descending order of likes")
     @GetMapping("/post/likes/{postId}")
-    public ResponseEntity<EntityModel<Review>> findAllReviewsByPostOrderByLikesDesc(@PathVariable("postId") UUID postId){
+    public ResponseEntity<EntityModel<Review>> findAllReviewsByPostOrderByLikesDesc(
+            @Parameter(
+                    description = "unique id of post",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("postId") UUID postId) {
 
         try {
             // Authorize user
@@ -85,7 +90,11 @@ public class ReviewController {
 
     @Operation(summary = "Get all reviews by post id in descending order of dislikes")
     @GetMapping("/post/dislikes/{postId}")
-    public ResponseEntity<EntityModel<Review>> findAllReviewsByPostOrderByDislikesDesc(@PathVariable("postId") UUID postId){
+    public ResponseEntity<EntityModel<Review>> findAllReviewsByPostOrderByDislikesDesc(
+            @Parameter(
+                    description = "unique id of post",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("postId") UUID postId){
 
         try {
             // Authorize user
@@ -106,8 +115,13 @@ public class ReviewController {
         }
     }
 
+    @Operation(summary = "Give a like by review id")
     @GetMapping("/like/{reviewId}")
-    public ResponseEntity<?> like(@PathVariable("reviewId") UUID id){
+    public ResponseEntity<?> like(
+            @Parameter(
+                    description = "unique id of review",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("reviewId") UUID id){
 
         try {
             // Authorize user
@@ -125,8 +139,13 @@ public class ReviewController {
         }
     }
 
+    @Operation(summary = "Give dislike by review id")
     @GetMapping("/dislike/{reviewId}")
-    public ResponseEntity<?> dislike(@PathVariable("reviewId") UUID id){
+    public ResponseEntity<?> dislike(
+            @Parameter(
+                    description = "unique id of review",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("reviewId") UUID id){
 
         try {
             // Authorize user
@@ -146,7 +165,11 @@ public class ReviewController {
 
     @Operation(summary = "Get review by id")
     @GetMapping("/{reviewId}")
-    public ResponseEntity<EntityModel<Review>> getById(@PathVariable("reviewId") UUID reviewId){
+    public ResponseEntity<EntityModel<Review>> getById(
+            @Parameter(
+                    description = "unique id of review",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("reviewId") UUID reviewId){
 
         Link link = linkTo(ReviewController.class).slash(reviewId).withSelfRel();
 
@@ -167,7 +190,12 @@ public class ReviewController {
 
     @Operation(summary = "Create review")
     @PostMapping("/{postId}")
-    public ResponseEntity<EntityModel<?>> save(@PathVariable("postId") UUID id, @RequestBody ReviewDTO reviewDTO){
+    public ResponseEntity<EntityModel<?>> save(
+            @Parameter(
+                    description = "unique id of post",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("postId") UUID id,
+            @RequestBody ReviewDTO reviewDTO){
 
         // Authorize user
         User user = identity.getCurrent();
@@ -194,7 +222,12 @@ public class ReviewController {
 
     @Operation(summary = "Update review by id")
     @PutMapping("/{reviewId}")
-    public ResponseEntity<EntityModel<?>> update(@PathVariable("reviewId") UUID reviewId, @RequestBody ReviewDTO reviewDTO){
+    public ResponseEntity<EntityModel<?>> update(
+            @Parameter(
+                    description = "unique id of review",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("reviewId") UUID reviewId,
+            @RequestBody ReviewDTO reviewDTO){
         try {
             Link link = linkTo(ReviewController.class).slash(reviewId).withSelfRel();
 
@@ -225,7 +258,11 @@ public class ReviewController {
 
     @Operation(summary = "Delete review by id")
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<?> deleteById(@PathVariable("reviewId") UUID reviewId){
+    public ResponseEntity<?> deleteById(
+            @Parameter(
+                    description = "unique id of review",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("reviewId") UUID reviewId){
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);

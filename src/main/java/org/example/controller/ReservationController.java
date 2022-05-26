@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.example.entity.Post;
 import org.example.entity.Reservation;
 import org.example.entity.User;
@@ -61,7 +62,11 @@ public class ReservationController {
 
     @Operation(summary = "Get reservation by id")
     @GetMapping("/{reservationId}")
-    public ResponseEntity<EntityModel<Reservation>> getById(@PathVariable("reservationId") UUID reservationId){
+    public ResponseEntity<EntityModel<Reservation>> getById(
+            @Parameter(
+                    description = "unique id of reservation",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("reservationId") UUID reservationId){
         Link link = linkTo(ReservationController.class).slash(reservationId).withSelfRel();
 
         // Authorize user
@@ -80,7 +85,11 @@ public class ReservationController {
 
     @Operation(summary = "Get all reservations by status")
     @GetMapping("/status/{status}")
-    public ResponseEntity<CollectionModel<Reservation>> getAllByStatus(@PathVariable("status") ReservationStatus status){
+    public ResponseEntity<CollectionModel<Reservation>> getAllByStatus(
+            @Parameter(
+                    description = "status of reservation",
+                    example = "created")
+            @PathVariable("status") ReservationStatus status){
         Link link = linkTo(ReservationController.class).slash("status").slash(status).withSelfRel();
 
         // Authorize user
@@ -104,7 +113,12 @@ public class ReservationController {
 
     @Operation(summary = "Create reservation")
     @PostMapping("/{postId}")
-    public ResponseEntity<EntityModel<?>> save(@PathVariable("postId") UUID postId, @RequestBody ReservationDTO reservationDTO){
+    public ResponseEntity<EntityModel<?>> save(
+            @Parameter(
+                    description = "unique id of post",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("postId") UUID postId,
+            @RequestBody ReservationDTO reservationDTO){
 
         // Authorize user
         User user = identity.getCurrent();
@@ -130,7 +144,11 @@ public class ReservationController {
 
     @Operation(summary = "Update reservation by id")
     @PutMapping("/{reservationId}")
-    public ResponseEntity<EntityModel<?>> update(@PathVariable("reservationId") UUID reservationId, @RequestBody ReservationDTO reservationDTO){
+    public ResponseEntity<EntityModel<?>> update(
+            @Parameter(
+                    description = "unique id of reservation",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("reservationId") UUID reservationId, @RequestBody ReservationDTO reservationDTO){
         Link link = linkTo(ReservationController.class).slash(reservationId).withSelfRel();
 
         // Authorize user
@@ -161,7 +179,11 @@ public class ReservationController {
 
     @Operation(summary = "Delete reservation by id")
     @DeleteMapping("/{reservationId}")
-    public ResponseEntity<?> deleteById(@PathVariable("reservationId") UUID reservationId){
+    public ResponseEntity<?> deleteById(
+            @Parameter(
+                    description = "unique id of reservation",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("reservationId") UUID reservationId){
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -179,7 +201,11 @@ public class ReservationController {
 
     @Operation(summary = "Delete reservation by status")
     @DeleteMapping("/status/{status}")
-    public ResponseEntity<?> deleteByStatus(@PathVariable("status") ReservationStatus status){
+    public ResponseEntity<?> deleteByStatus(
+            @Parameter(
+                    description = "status of reservation",
+                    example = "created")
+            @PathVariable("status") ReservationStatus status){
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);

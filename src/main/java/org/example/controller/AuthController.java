@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.example.dto.JWTAuthResponse;
 import org.example.dto.LoginDto;
 import org.example.dto.SignUpDto;
@@ -39,7 +40,9 @@ public class AuthController {
 
     @Operation(summary = "Signup user to EasyHotel")
     @PostMapping("/signin")
-    public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto){
+    public ResponseEntity<JWTAuthResponse> authenticateUser(
+            @Parameter(description = "Credentials")
+            @RequestBody LoginDto loginDto){
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginDto.getNickOrEmail(), loginDto.getPassword()));
