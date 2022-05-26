@@ -11,7 +11,7 @@ Internet service for renting apartments from private persons. An authorized user
 ## Use cases
 ### Login & Register
 <p align="center">
-  <img width="460" height="300" src="https://user-images.githubusercontent.com/64873606/170501640-65c26256-b9fd-4b5a-9aea-3b5f76195fb5.png">
+  <img width="460" height="300" src="https://user-images.githubusercontent.com/64873606/170527926-febc39ed-52a5-4f1f-8248-cf9e6601895e.png">
 </p>
 
 ### Posting & Reservation
