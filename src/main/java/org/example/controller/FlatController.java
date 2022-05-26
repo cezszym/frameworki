@@ -53,6 +53,7 @@ public class FlatController {
             ArrayList<Flat> flats = new ArrayList<>(this.flatRepository.getAllByUser(user));
             if (flats.isEmpty()) return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             flats.forEach(flat -> flat.add(linkTo(FlatController.class).slash(flat.getId()).withSelfRel()));
+            flats.forEach(flat -> flat.add(linkTo(FlatController.class).slash("details").slash(flat.getId()).withRel("flatDetails")));
             return ResponseEntity.ok(CollectionModel.of(flats,link));
         } catch(Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -61,7 +62,7 @@ public class FlatController {
 
     @Operation(summary = "Get flat by id")
     @GetMapping("/{flatId}")
-    public ResponseEntity<EntityModel<?>> getById(
+    public ResponseEntity<?> getById(
             @Parameter(
                     description = "unique id of flat",
                     example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
@@ -76,8 +77,13 @@ public class FlatController {
 
             Flat flat = this.flatRepository.getByUserAndId(user, id);
             if (flat == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            // FlatDetail link
+            Link flat_link = linkTo(FlatController.class).slash("details").slash(flat.getId()).withRel("flatDetails");
 
-            return ResponseEntity.ok(EntityModel.of(flat,link));
+            flat.add(link);
+            flat.add(flat_link);
+
+            return new ResponseEntity<>(flat, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -126,7 +132,7 @@ public class FlatController {
 
     @Operation(summary = "Create flat")
     @PostMapping("/")
-    public ResponseEntity<EntityModel<Flat>> save(@RequestBody FlatWrapper flatWrapper){
+    public ResponseEntity<Flat> save(@RequestBody FlatWrapper flatWrapper){
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -158,7 +164,13 @@ public class FlatController {
             browserService.createFlat(flat);
 
             Link link = linkTo(FlatController.class).slash(flat.getId()).withSelfRel();
-            return ResponseEntity.ok(EntityModel.of(flat, link));
+            // FlatDetail link
+            Link flat_link = linkTo(FlatController.class).slash("details").slash(flat.getId()).withRel("flatDetails");
+
+            flat.add(link);
+            flat.add(flat_link);
+
+            return new ResponseEntity<>(flat, HttpStatus.CREATED);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -166,7 +178,7 @@ public class FlatController {
 
     @Operation(summary = "Update flat by id")
     @PutMapping("/{flatId}")
-    public ResponseEntity<EntityModel<Flat>> update(
+    public ResponseEntity<Flat> update(
             @Parameter(
                     description = "unique id of flat",
                     example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
@@ -208,7 +220,13 @@ public class FlatController {
             // update indexed flat
             browserService.updateFlat(flat);
 
-            return ResponseEntity.ok(EntityModel.of(flat, link));
+            // FlatDetail link
+            Link flat_link = linkTo(FlatController.class).slash("details").slash(flat.getId()).withRel("flatDetails");
+
+            flat.add(link);
+            flat.add(flat_link);
+
+            return new ResponseEntity<>(flat, HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
