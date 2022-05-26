@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.example.entity.Flat;
 import org.example.entity.FlatDetail;
 import org.example.entity.User;
@@ -60,7 +61,11 @@ public class FlatController {
 
     @Operation(summary = "Get flat by id")
     @GetMapping("/{flatId}")
-    public ResponseEntity<EntityModel<?>> getById(@PathVariable("flatId") UUID id){
+    public ResponseEntity<EntityModel<?>> getById(
+            @Parameter(
+                    description = "unique id of flat",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("flatId") UUID id){
 
         Link link = linkTo(FlatController.class).slash(id).withSelfRel();
 
@@ -97,7 +102,11 @@ public class FlatController {
 
     @Operation(summary = "Get details about the flats by id")
     @GetMapping("/details/{flatId}")
-    public ResponseEntity<EntityModel<?>> getDetails(@PathVariable("flatId") UUID id){
+    public ResponseEntity<EntityModel<?>> getDetails(
+            @Parameter(
+                    description = "unique id of flat",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("flatId") UUID id){
         try {
             // Authorize user
             User user = identity.getCurrent();
@@ -157,7 +166,11 @@ public class FlatController {
 
     @Operation(summary = "Update flat by id")
     @PutMapping("/{flatId}")
-    public ResponseEntity<EntityModel<Flat>> update(@PathVariable("flatId") UUID id, @RequestBody FlatWrapper flatWrapper){
+    public ResponseEntity<EntityModel<Flat>> update(
+            @Parameter(
+                    description = "unique id of flat",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("flatId") UUID id, @RequestBody FlatWrapper flatWrapper){
         Link link = linkTo(FlatController.class).slash(id).withSelfRel();
 
         // Authorize user
@@ -203,7 +216,11 @@ public class FlatController {
 
     @Operation(summary = "Delete flat by id")
     @DeleteMapping("/{flatId}")
-    public ResponseEntity<?> delete(@PathVariable("flatId") UUID flatId){
+    public ResponseEntity<?> delete(
+            @Parameter(
+                    description = "unique id of flat",
+                    example = "b8d02d81-6329-ef96-8a4d-55b376d8b25a")
+            @PathVariable("flatId") UUID flatId){
         // Authorize user
         User user = identity.getCurrent();
         if (user == null) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);

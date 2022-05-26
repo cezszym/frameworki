@@ -1,5 +1,7 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.example.entity.Flat;
 import org.example.entity.FlatDetail;
@@ -28,8 +30,13 @@ public class SearchController {
         this.browserService = browserService;
     }
 
+    @Operation(summary = "Search for flats by specific query")
     @GetMapping("/flats")
-    public ResponseEntity<List<FlatDTO>> searchFlats(String query){
+    public ResponseEntity<List<FlatDTO>> searchFlats(
+            @Parameter(
+                    description = "query for flats",
+                    example = "city:lublin")
+            String query){
         if (query == null || query.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
@@ -41,8 +48,13 @@ public class SearchController {
         }
     }
 
+    @Operation(summary = "Search for posts by specific query")
     @GetMapping("/posts")
-    public ResponseEntity<List<PostDTO>> searchPosts(String query){
+    public ResponseEntity<List<PostDTO>> searchPosts(
+            @Parameter(
+                    description = "query for posts",
+                    example = "price:[100 TO 300]")
+            String query){
         if (query == null || query.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
