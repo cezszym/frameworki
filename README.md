@@ -4,6 +4,7 @@ Website for renting apartments and adding your own ads.
 ## Table of contents
 * [General info](#general-info)
 * [Use cases](#use-cases)
+* [Authors](#authors)
 
 ## General info
 Internet service for renting apartments from private persons. An authorized user can book a flat and add his own advertisement. For a better search for flats, the application has been equipped with a search engine (Lucene queryparser). API resources are available through JWT.
@@ -28,3 +29,11 @@ Internet service for renting apartments from private persons. An authorized user
 <p align="center">
   <img width="460" height="300" src="https://user-images.githubusercontent.com/64095970/170205766-45c5f81b-848f-42bf-8531-eacbfa906152.png">
 </p>
+
+## Authors
+- Jakub Sieczka
+- Bogumił Sokołowski-Duda
+- Patryk Suruło
+- Cezary Szymański
+- Mykola Ostapczuk
+
