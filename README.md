@@ -6,6 +6,7 @@ Website for renting apartments and adding your own ads.
 * [Use cases](#use-cases)
 * [Lucene search](#lucene-search)
 * [Authors](#authors)
+* [Swagger](#swagger)
 
 ## General info
 Internet service for renting apartments from private persons. An authorized user can book a flat and add his own advertisement. For a better search for flats, the application has been equipped with a search engine (Lucene queryparser). API resources are available through JWT.
@@ -61,6 +62,14 @@ In order to search user needs to set a query value that needs to be encoded. Use
 * **range search**: in numeric field search user can use range search like \<\<fieldName\>\>:\[min_value TO max_value\] e.g. rooms:\[1 TO 5\]
 * **proximity search**: user can search for similar to query words by adding "edit distance" parameter to search like \<\<fieldName\>\>:query~\<\<proximity_value\>\> e.g. city:Lublin~4
 * **full documentation**: [Lucene queries](https://lucene.apache.org/core/9_1_0/queryparser/org/apache/lucene/queryparser/flexible/standard/StandardQueryParser.html)
+
+## Swagger
+Swagger is a tool that describes the API structure of our project.
+
+### How to use
+After launching the application, visit the following URLs:
+* http://localhost:8080/v3/api-docs/
+* http://localhost:8080/swagger-ui/index.html
 
 ## Authors
 - Jakub Sieczka
