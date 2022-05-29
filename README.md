@@ -39,6 +39,8 @@ Internet service for renting apartments from private persons. An authorized user
 In order to search user needs to set a query value that needs to be encoded. User needs to go to tab Params in postman and set key as query and value as query value.
 
 ### Encoding process:
+![chrome_uPG0xhXhVt](https://user-images.githubusercontent.com/84717819/170857374-624aefd2-efb5-4e92-8daf-dcbcc8c28f3b.png)
+![chrome_igM9z93Dbv](https://user-images.githubusercontent.com/84717819/170857379-047a0574-384c-4e54-8476-7a42643e4ac8.png)
 
 
 ### Query options:
