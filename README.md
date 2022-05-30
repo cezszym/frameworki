@@ -34,8 +34,7 @@ Internet service for renting apartments from private persons. An authorized user
 
 ## Lucene search
 ### Instalation
-1. ```git clone```
-2. install meaven dependencies
+Lucene is installed automatically by meaven
 ### Search
 In order to search user needs to set a query value that needs to be encoded. User needs to go to tab Params in postman and set key as query and value as query value.
 
