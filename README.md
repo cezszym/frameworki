@@ -76,4 +76,4 @@ After launching the application, visit the following URLs:
 - Bogumił Sokołowski-Duda
 - Patryk Suruło
 - Cezary Szymański
-- Mykola Ostapczuk
+- Mykola Ostapchuk
