@@ -37,6 +37,11 @@ Internet service for renting apartments from private persons. An authorized user
   <img width="600" height="750" src="https://user-images.githubusercontent.com/47782722/171127120-3638cd82-ac4c-4dc4-808f-66d7a0be391f.png">
 </p>
 
+### Database scheme
+<p align="center">
+  <img width="600" height="750" src="https://user-images.githubusercontent.com/47782722/171142510-69735cc7-d2e9-4b7a-840f-5e54b51d1111.png">
+</p>
+
 ## Lucene search
 ### Instalation
 Lucene is installed automatically by meaven
