@@ -4,6 +4,8 @@ Website for renting apartments and adding your own ads.
 ## Table of contents
 * [General info](#general-info)
 * [Use cases](#use-cases)
+* [Postman queries order](#Postman queries order)
+* [Database scheme](#Database scheme)
 * [Lucene search](#lucene-search)
 * [Swagger](#swagger)
 * [Authors](#authors)
