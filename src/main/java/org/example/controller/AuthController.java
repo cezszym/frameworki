@@ -38,7 +38,7 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider tokenProvider;
 
-    @Operation(summary = "Signup user to EasyHotel")
+    @Operation(summary = "Signin user to EasyHotel")
     @PostMapping("/signin")
     public ResponseEntity<JWTAuthResponse> authenticateUser(
             @Parameter(description = "Credentials")
@@ -60,7 +60,7 @@ public class AuthController {
 
     }
 
-    @Operation(summary = "Signin user to EasyHotel")
+    @Operation(summary = "Signup user to EasyHotel")
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpDto signUpDto){
 
