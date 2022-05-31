@@ -1,0 +1,316 @@
+{
+	"info": {
+		"_postman_id": "adf8e83a-9fed-4dcf-b05b-f81d4b2d9054",
+		"name": "Flats",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16440980"
+	},
+	"item": [
+		{
+			"name": "GET count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/flats/count",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flats",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET ALL flats",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/flats/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flats",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET flat",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/flats/{{flat_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flats",
+						"{{flat_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET flat details",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/flats/details/{{flat_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flats",
+						"details",
+						"{{flat_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE flat",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"const id = jsonData.id;\r",
+							"\r",
+							"pm.globals.set(\"flat_id\", id);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"flatDTO\":\r\n    {\r\n        \"adress\": \"Ulica 321\",\r\n        \"postCode\": \"31-123\",\r\n        \"city\": \"Lublin\",\r\n        \"country\": \"Poland\",\r\n        \"metrage\": 53,\r\n        \"numOfRooms\": 4\r\n    },\r\n\r\n\"flatDetailDTO\":\r\n    {\r\n        \"kitchen\": \"true\",\r\n        \"bathroom\": \"true\",\r\n        \"towels\": \"true\",\r\n        \"wifi\": \"true\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/flats/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flats",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE flat",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"const id = jsonData.id;\r",
+							"\r",
+							"pm.globals.set(\"flat_id\", id);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"flatDTO\":\r\n    {\r\n        \"adress\": \"Nowa Ulica 321\",\r\n        \"postCode\": \"nowy 31-123\",\r\n        \"city\": \"Lublin\",\r\n        \"country\": \"Poland\",\r\n        \"metrage\": 53,\r\n        \"numOfRooms\": 4\r\n    },\r\n\r\n\"flatDetailDTO\":\r\n    {\r\n        \"kitchen\": \"false\",\r\n        \"bathroom\": \"true\",\r\n        \"towels\": \"false\",\r\n        \"wifi\": \"true\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/flats/{{flat_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flats",
+						"{{flat_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE flat",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/flats/{{flat_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flats",
+						"{{flat_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "savedData",
+			"value": ""
+		},
+		{
+			"key": "flat_link",
+			"value": ""
+		},
+		{
+			"key": "flat_detail_link",
+			"value": ""
+		},
+		{
+			"key": "flat_detail_id",
+			"value": ""
+		},
+		{
+			"key": "jwt",
+			"value": ""
+		}
+	]
+}

@@ -17,28 +17,10 @@ import java.util.UUID;
 public class UserDTO {
 
     private UUID id;
-    private String email;
     private String nick;
-    private String firstname;
-    private String lastname;
-    private String phoneNumber;
-    private String password;
-//    private List<Flat> flatList;
-//    private List<Post> postList;
-//    private List<Reservation> reservationList;
-//    private List<Review> reviewList;
 
     public static UserDTO fromEntity(User user) {
         return new UserDTO(user.getId(),
-                user.getEmail(),
-                user.getNick(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getPhoneNumber(),
-                user.getPassword());
-//                user.getFlats(),
-//                user.getPosts(),
-//                user.getReservations(),
-//                user.getReviews());
+                user.getNick());
     }
 }

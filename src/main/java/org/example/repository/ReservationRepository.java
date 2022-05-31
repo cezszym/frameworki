@@ -11,10 +11,8 @@ import java.util.UUID;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
-
     List<Reservation> getAllByUser(User user);
     Reservation getByUserAndId(User user, UUID reservationId);
     List<Reservation> getAllByUserAndStatus(User user, ReservationStatus reservationStatus);
     void deleteById(UUID reservationId);
-    void deleteByUser(User user);
 }

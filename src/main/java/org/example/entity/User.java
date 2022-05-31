@@ -38,20 +38,4 @@ public class User {
 
     @NotNull
     private String password;
-
-//    @NotNull
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-//    private List<Flat> flats;
-//
-//    @NotNull
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-//    private List<Post> posts;
-//
-//    @NotNull
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-//    private List<Reservation> reservations;
-//
-//    @NotNull
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-//    private List<Review> reviews;
 }

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Post {
+public class Post extends RepresentationModel<Post> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,5 +43,4 @@ public class Post {
     private long created;
 
     private long expired;
-
 }
