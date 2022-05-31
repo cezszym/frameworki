@@ -1,1 +1,16 @@
-Tak jak wspomnieliśmy na ostatnim spotkaniu, staramy się uzyskać ocenę 4.5
+                                                 888888888  
+                                                 888        
+                                                 888        
+ .d88b.   .d8888b  .d88b.  88888b.   8888b.      8888888b.  
+d88""88b d88P"    d8P  Y8b 888 "88b     "88b          "Y88b 
+888  888 888      88888888 888  888 .d888888            888 
+Y88..88P Y88b.    Y8b.     888  888 888  888     Y88b  d88P 
+ "Y88P"   "Y8888P  "Y8888  888  888 "Y888888      "Y8888P"  
+ 
+ 
+ Wszystkie wymagania na ocenę 4 są wykonane i dodane do naszego projektu. Dla otrzymania oceny wyższej niż 4 zostaly dodane:
+-Osiągnięcie "glory of rest" (hateoas)
+-Wykorzystanie do projektowania i dokumentacji API narzędzia typu https://swagger.io/
+-Poprawne wykorzystanie 6 starterów aplikacji SpringBoot’a
+-Wykorzystanie JWT jwt.io
+Dodatkowy element dodany w celu podniesienia oceny całego projektu to wyszukiwarka Lucine.
