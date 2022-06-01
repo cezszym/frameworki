@@ -13,4 +13,6 @@ Y88..88P Y88b.    Y8b.     888  888 888  888     Y88b  d88P
 -Wykorzystanie do projektowania i dokumentacji API narzędzia typu https://swagger.io/
 -Poprawne wykorzystanie 6 starterów aplikacji SpringBoot’a
 -Wykorzystanie JWT jwt.io
-Dodatkowy element dodany w celu podniesienia oceny całego projektu to wyszukiwarka Lucine.
+Dodatkowy element dodany w celu podniesienia oceny całego projektu to:
+-Wyszukiwarka Lucine
+-Spring Security
